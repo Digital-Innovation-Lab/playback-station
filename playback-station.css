@@ -1,0 +1,439 @@
+/******************************************************************
+ ** CSS for Playback Station
+ **/
+
+
+  /* Normalize box sizes! See: http://css-tricks.com/international-box-sizing-awareness-day/
+   */
+*, *:before, *:after {
+    -webkit-box-sizing: border-box; 
+    -moz-box-sizing: border-box; 
+    box-sizing: border-box;
+}
+
+html {
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+}
+
+body {
+	font-family: 'Gill Sans', 'Gill Sans MT', Calibri, sans-serif;
+    font-size: 14px;
+    background-color: black;
+}
+
+    /* For busy cursor */
+body.waiting * {
+    cursor: wait !important;
+}
+
+footer {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+    -webkit-flex-direction: row;
+    -ms-flex-direction: row;
+    flex-direction: row;
+
+    color: yellow;
+    height: 30px;
+    padding: 6px;
+}
+
+header {
+    width: 100%;
+    color: yellow;
+    padding: 4px;
+}
+
+    /* Creates general layout ===================================
+     * http://philipwalton.github.io/solved-by-flexbox/demos/holy-grail/
+      */
+
+.HolyGrail {
+    min-height: 100%;
+}
+
+.HolyGrail, .HolyGrail-body {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -webkit-flex-direction: column;
+    -ms-flex-direction: column;
+    flex-direction: column;
+}
+
+.HolyGrail-body {
+    padding: .5em;
+    color: white;
+}
+
+.HolyGrail-content {
+    margin: .5em 0;
+}
+
+.HolyGrail-nav {
+    -webkit-box-ordinal-group: 0;
+    -webkit-order: -1;
+    -ms-flex-order: -1;
+    order: -1;
+}
+
+.HolyGrail-nav, .HolyGrail-activity {
+    padding: 4px;
+    border-radius: 3px;
+    background: rgba(147, 128, 108, .1);
+}
+
+.HolyGrail-nav > p {
+    margin: 4px;
+    padding: 0;
+    margin-bottom: 7px;
+}
+
+.HolyGrail-activity {
+    overflow-x: hidden;
+}
+
+.HolyGrail-activity > p {
+    margin: 4px;
+    padding: 0;
+    margin-bottom: 7px;
+}
+
+    /* Top part of right sidebar */
+#pbs-activity {
+    height: 190px;
+    padding: 4px;
+    margin: 0px;
+}
+
+#pbs-activity p {
+    margin: 0px;
+    margin-bottom: 4px;
+    padding: 0px;
+}
+
+    /* Bottom part of right sidebar */
+#pbs-user-container {
+    height: 340px;
+    overflow-y: auto;
+}
+
+#pbs-user-collection {
+    overflow: hidden;
+}
+
+    /* Area for User Collection */
+#pbs-user-collection p {
+    margin-top: 2px;
+    margin-bottom: 2px;
+}
+
+#pbs-user-collection .track-select {
+    cursor: pointer;
+}
+
+
+    /* Specific screen/media optimizations =============
+     */
+
+@media (min-width:48em) {
+    .HolyGrail-body {
+        -webkit-box-flex: 1;
+        -webkit-flex: 1 1 auto;
+        -ms-flex: 1 1 auto;
+        flex: 1 1 auto;
+        -webkit-box-orient: horizontal;
+        -webkit-box-direction: normal;
+        -webkit-flex-direction: row;
+        -ms-flex-direction: row;
+        flex-direction: row;
+    }
+
+    .HolyGrail-content {
+        -webkit-box-flex: 1;
+        -webkit-flex: 1;
+        -ms-flex: 1;
+        flex: 1;
+        padding: 0 .5em;
+        margin: 0;
+    }
+
+    .HolyGrail-nav, .HolyGrail-activity {
+        -webkit-box-flex: 0;
+        -webkit-flex: 0 0 12em;
+        -ms-flex: 0 0 12em;
+        flex: 0 0 12em;
+    }
+}
+
+
+    /* Media objects ============
+     * See http://philipwalton.github.io/solved-by-flexbox/demos/media-object/
+     */
+
+.Media {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+
+    -webkit-box-align: start;
+    -webkit-align-items: flex-start;
+    -ms-flex-align: start;
+    align-items: flex-start;
+}
+
+.Media-figure {
+    margin-right: 1em;
+}
+
+.Media-body {
+    -webkit-box-flex: 1;
+    -webkit-flex: 1 1 auto;
+    -ms-flex: 1 1 auto;
+    flex: 1;
+}
+
+
+.Media-body, .Media-body :last-child {
+    margin-bottom: 0
+}
+
+.Media--center {
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    -ms-flex-align: center;
+    align-items: center
+}
+
+.Media--reverse > .Media-figure {
+    -webkit-box-ordinal-group: 2;
+    -webkit-order: 1;
+    -ms-flex-order: 1;
+    order: 1;
+    margin: 0 0 0 1em
+}
+
+
+    /* Navigation Bar ====================
+     */
+
+.play-icon {
+    width: 22px;
+}
+
+.play-option {
+    cursor: pointer;
+    margin-top: 6px;
+    margin-bottom: 6px;
+}
+
+.play-option.selected {
+    color: yellow;
+}
+
+nav hr {
+    border-style: dotted;
+}
+
+.play-results-container {
+    height: 375px;
+    overflow-y: auto;
+}
+
+#play-results {
+    overflow: hidden;
+}
+
+.play-result {
+    cursor: pointer;
+}
+
+.play-result:hover {
+    color: yellow;
+}
+
+    /* Main Content area ====================
+     * main-top-view (icon, title and abstract)
+     * main-tabbed (tabbed view)
+     */
+
+#main-top-view {
+    height: 180px;
+    padding: 6px;
+    background-color: #404040;
+    overflow: auto;
+}
+
+.album {
+    width: 150px !important;
+    height: 150px !important;
+    margin: 6px;
+    float: left;
+}
+
+#main-tabbed {
+    height: 400px;
+}
+
+/* Tabs scrollable content
+ */
+
+#tabs > ul { position: fixed; width: 100%; }
+
+.tab-content {
+    max-height: 360px;
+    overflow-y: auto;
+    font-size: 12px;
+}
+
+.ui-tabs-nav {
+    font-size: 12px;
+}
+
+/* Track lists
+ */
+
+#track-table {
+    display: table;
+    border-spacing: 8px 4px;
+}
+
+.track-entry {
+    display: table-row;
+}
+
+.track-entry:nth-child(odd) {
+    background: #EEE;
+}
+
+.track-entry.playing {
+    color: red;
+}
+
+.track-title {
+    display: table-cell;
+    padding-left: 3px;
+    padding-right: 3px;
+}
+
+.track-year {
+    display: table-cell;
+    padding-left: 3px;
+    padding-right: 3px;
+}
+
+.track-time {
+    display: table-cell;
+    padding-left: 3px;
+    padding-right: 3px;
+}
+
+.track-credits {
+    display: table-cell;
+    padding-left: 3px;
+    padding-right: 3px;
+}
+
+/* Transcriptions
+ */
+
+#transcr-table {
+    display: table;
+    border-spacing: 8px 4px;
+}
+
+.transcr-entry {
+    display: table-row;
+}
+
+.transcr-entry:nth-child(odd) {
+    background: #EEE;
+}
+
+.transcr-timestamp {
+    display: table-cell;
+    cursor: pointer;
+    padding-left: 3px;
+    padding-right: 3px;
+}
+
+    /* "Playhead" styling is on timestamp */
+.transcr-timestamp.playing {
+    background-color: #007fff;
+    color: #fff;
+}
+
+.transcr-timestamp:hover {
+    background-color: #0055bb;
+    color: #fff;
+}
+
+.transcr-text {
+    display: table-cell;
+    padding-left: 3px;
+    padding-right: 3px;
+}
+
+/* Footer Playback controls ========================
+ */
+
+.play-slider {
+    margin-left: 15px;
+    margin-right: 15px;
+    margin-top: 4px;
+    width: 200px;
+
+    height: 8px;
+    background: url('images/slider-bg.png');
+
+    background-color: #8e8d8d;
+
+    border-width: 1px;
+    border-style: solid;
+    border-color: #333 #333 #777 #333;
+    border-radius: 20px;
+
+/*    box-shadow: inset 0 1px 5px 0px rgba(0, 0, 0, .5),
+                 0 1px 0 0px rgba(250, 250, 250, .5);
+ */
+}
+
+footer .ui-slider-handle {
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+
+    font-weight: bold;
+    color: #1C94C4;
+    outline: none;
+    margin-top: -2px;
+    margin-left:-12px;
+    z-index: 2;
+    background: url('images/handle.png') no-repeat 50% 50%;
+
+    position: absolute;
+    top: -7px;
+}
+
+footer .ui-widget-header {
+    background: url('images/fill.png') no-repeat left;
+    height:8px;
+/*
+    left:1px;
+    top:1px;
+    position:absolute;
+*/
+}
+

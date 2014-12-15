@@ -1,0 +1,11 @@
+/* class-playback-station-admin.php
+ * Define styles for Playback Station Dashboard
+ */
+
+#playback-station {
+    width:  100%;
+}
+ 
+#playback-station .key {
+    font-weight: bold;
+}
