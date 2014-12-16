@@ -40,18 +40,9 @@ class Playback_Station {
 		return strcmp($a["title"], $b["title"]);
 	} // cmp_titles()
 
-
-		// PURPOSE:	Called by WP to modify output when viewing a page of any type
-		// INPUT:	$page_template = default path to file to use for template to render page
-		// RETURNS:	Modified $page_template setting (file path to new php template file)
-	public function pbs_page_template($page_template)
+		// PURPOSE: Enqueue styles and scripts for template
+	public function pbs_load_scripts()
 	{
-		global $post;
-
-		$blog_id = get_current_blog_id();
-		$ajax_url = get_admin_url($blog_id ,'admin-ajax.php');
-		$post_type = get_query_var('post_type');
-
 			// Ensure we're viewing a Collections page
 	    if ($post_type == 'pbs-collection') {
 				// Load required JS libraries
@@ -66,7 +57,23 @@ class Playback_Station {
 			wp_enqueue_style('jquery-ui-css', plugins_url('lib/jquery-ui.css', dirname(__FILE__)), '', $this->version );
 			wp_enqueue_style('jquery-ui-struct-css', plugins_url('lib/jquery-ui.structure.css', dirname(__FILE__)), '', $this->version );
 			wp_enqueue_style('jquery-ui-theme-css', plugins_url('lib/jquery-ui.theme.css', dirname(__FILE__)), '', $this->version );
+		}
+	} // pbs_load_scripts()
 
+
+		// PURPOSE:	Called by WP to modify output when viewing a page of any type
+		// INPUT:	$page_template = default path to file to use for template to render page
+		// RETURNS:	Modified $page_template setting (file path to new php template file)
+	public function pbs_page_template($page_template)
+	{
+		global $post;
+
+		$blog_id = get_current_blog_id();
+		$ajax_url = get_admin_url($blog_id ,'admin-ajax.php');
+		$post_type = get_query_var('post_type');
+
+			// Ensure we're viewing a Collections page
+	    if ($post_type == 'pbs-collection') {
 				// Compile array of all tracks
 			$tracks = array();
 			$args = array('post_type' => 'dhp-track', 'posts_per_page' => -1);
@@ -246,6 +253,7 @@ class Playback_Station {
 	private function define_page_hooks()
 	{
 		$this->loader->add_filter('single_template', $this, 'pbs_page_template');
+		$this->loader->add_action('wp_enqueue_scripts', $this, 'pbs_load_scripts');
 	} // define_page_hooks()
 
 
