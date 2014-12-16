@@ -40,25 +40,42 @@ class Playback_Station {
 		return strcmp($a["title"], $b["title"]);
 	} // cmp_titles()
 
+
 		// PURPOSE: Enqueue styles and scripts for template
 	public function pbs_load_scripts()
 	{
 			// Ensure we're viewing a Collections page
-	    if ($post_type == 'pbs-collection') {
+	    // if ($post_type == 'pbs-collection') {
 				// Load required JS libraries
 			wp_enqueue_script('jquery');
 			// wp_enqueue_script('modernizr');
 			wp_enqueue_script('underscore');
 			wp_enqueue_script('jquery-ui', plugins_url('lib/jquery-ui.min.js', dirname(__FILE__)), 'jquery');
 
+			wp_enqueue_script('soundcloud-api', 'http://w.soundcloud.com/player/api.js');
 	    		// Load required styles
 			wp_enqueue_style('pbs-css', plugins_url('playback-station.css', dirname(__FILE__)), '', $this->version );
 			wp_enqueue_style('font-awesome', plugins_url('lib/font-awesome/css/font-awesome.min.css', dirname(__FILE__)), '', $this->version );
 			wp_enqueue_style('jquery-ui-css', plugins_url('lib/jquery-ui.css', dirname(__FILE__)), '', $this->version );
 			wp_enqueue_style('jquery-ui-struct-css', plugins_url('lib/jquery-ui.structure.css', dirname(__FILE__)), '', $this->version );
 			wp_enqueue_style('jquery-ui-theme-css', plugins_url('lib/jquery-ui.theme.css', dirname(__FILE__)), '', $this->version );
-		}
+		// }
 	} // pbs_load_scripts()
+
+
+		// PURPOSE: Enqueue styles and scripts for template
+	// public function pbs_load_styles()
+	// {
+	// 		// Ensure we're viewing a Collections page
+	//     // if ($post_type == 'pbs-collection') {
+	//     		// Load required styles
+	// 		wp_enqueue_style('pbs-css', plugins_url('playback-station.css', dirname(__FILE__)), '', $this->version );
+	// 		wp_enqueue_style('font-awesome', plugins_url('lib/font-awesome/css/font-awesome.min.css', dirname(__FILE__)), '', $this->version );
+	// 		wp_enqueue_style('jquery-ui-css', plugins_url('lib/jquery-ui.css', dirname(__FILE__)), '', $this->version );
+	// 		wp_enqueue_style('jquery-ui-struct-css', plugins_url('lib/jquery-ui.structure.css', dirname(__FILE__)), '', $this->version );
+	// 		wp_enqueue_style('jquery-ui-theme-css', plugins_url('lib/jquery-ui.theme.css', dirname(__FILE__)), '', $this->version );
+	// 	// }
+	// } // pbs_load_styles()
 
 
 		// PURPOSE:	Called by WP to modify output when viewing a page of any type
@@ -254,6 +271,7 @@ class Playback_Station {
 	{
 		$this->loader->add_filter('single_template', $this, 'pbs_page_template');
 		$this->loader->add_action('wp_enqueue_scripts', $this, 'pbs_load_scripts');
+		// $this->loader->add_action('wp_enqueue_styles', $this, 'pbs_load_styles');
 	} // define_page_hooks()
 
 

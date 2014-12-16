@@ -11,6 +11,11 @@
 //					type: 		String
 //						items: 	Array of collections of this type sorted by title
 
+// TO DO:   Insert SoundCloud controls into DOM
+//          Add "Update" button to user collection area for un-selecting tracks?
+//          Handle coming to end of track currently playing: automatically play next if from collection
+//          Handle all user selections
+
 jQuery(document).ready(function($) {
 		// access data compiled by plugin's PHP code
 	var tracks = psData.tracks;
@@ -198,22 +203,28 @@ jQuery(document).ready(function($) {
 
 
 		// PURPOSE: Display list of collections given current collection type selection
-	function displayCollections()
+	function displayAllCollections()
 	{
+            // Empty list of collections
 		$('#play-results').empty();
 
 		var collType = _.find(collections, function(theCollType) {
 			return theCollType.type === selCollType;
 		});
-	} // displayCollections()
+	} // displayAllCollections()
 
 
-		// PURPOSE: Display list of collections given current collection selection
-	function displayTracks()
+		// PURPOSE: Display all materials relating to current collection selection
+	function displayACollection()
 	{
+            // Empty list of tracks (in Tracks tab)
 		$('#track-table').empty();
-			// TO DO
-	} // displayCollections()
+
+            // TO DO: Show icon for collection
+            // TO DO: Display title & abstract for collection
+            // TO DO: List all tracks in collection
+            // TO DO: Load abstract into Details tab contents
+	} // displayACollection()
 
 
 		// PURPOSE: Bind code that handles selecting a collection type
@@ -229,15 +240,20 @@ jQuery(document).ready(function($) {
 					// Set selection variables
 				selCollType = $(evt.target).text().trim();
 				indexCollType = selIndex;
+
+                    // TO DO: Clear out track listings
+                    // TO DO: Clear out current selected collection window
+                    // TO DO: Clear out Details tab contents
+                    // TO DO: Clear out Transcript tab contents
+
 					// Show relevant collection materials
-				displayCollections();
-					// TO DO: Clear out track listings
+				displayAllCollections();
 			}
 		});
 	} // bindSelectCollType()
 
 
-		// PURPOSE: Bind code that handles selecting a collection
+		// PURPOSE: Bind code that handles selecting a particular collection
 	function bindSelectCollection()
 	{
 		$('#play-results').click(function(evt) {
@@ -251,15 +267,20 @@ jQuery(document).ready(function($) {
 						// Set selection variables
 					selCollection = $(evt.target).text();
 					indexCollection = selIndex;
-						// Show relevant tracks
-					// TO DO
+                    // TO DO: Clear out track listings
+                    // TO DO: Clear out current selected collection window
+                    // TO DO: Clear out Details tab contents
+                    // TO DO: Clear out Transcript tab contents
+
+						// Display all material about selected collection
+                    displayACollection();
 				}
 			}
 		});
 	} // bindSelectCollection()
 
 
-		// PURPOSE: Bind code that handles selecting a track
+		// PURPOSE: Bind code that handles selecting a particular track
 	function bindSelectTrack()
 	{
 		$('#track-table').click(function(evt) {
@@ -274,6 +295,8 @@ jQuery(document).ready(function($) {
 						// Set selection variables
 					indexTrack = selIndex;
 						// TO DO: Set SoundCloud to play
+                        // TO DO: Clear out Transcript tab contents
+                        // TO DO: Load track transcript into Transcript tab contents
 				}
 			}
 		});
@@ -287,6 +310,20 @@ jQuery(document).ready(function($) {
 	} // bindSelectPlayer()
 
 
+        // PURPOSE: Bind code to handle searches
+    function bindSearch()
+    {
+
+    } // bindSearch()
+
+
+        // PURPOSE: Bind code to handle User collections
+    function bindUserCollection()
+    {
+
+    } // bindUserCollection()
+
+
 		// Initialize jQueryUI components
 	$( "#main-tabbed" ).tabs();
 	$(".play-slider").slider();
@@ -294,12 +331,13 @@ jQuery(document).ready(function($) {
 
     	// Select collection type by default
     indexCollType = 0;
-    displayCollections();
+    displayAllCollections();
 
     	// Bind code to handle UI components
     bindSelectCollType();
     bindSelectCollection();
     bindSelectTrack();
     bindSelectPlayer();
+    bindSearch();
     bindTranscrSeek();
 });
