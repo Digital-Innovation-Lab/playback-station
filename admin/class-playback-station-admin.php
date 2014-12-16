@@ -14,7 +14,7 @@ class Playback_Station_Admin {
 
 	public function enqueue_styles()
 	{
-        wp_enqueue_style('playback-station-admin-css', plugin_dir_url( __FILE__ ) . 'css/class-playback-station-admin.css',
+        wp_enqueue_style('playback-station-admin-css', plugin_dir_url( __FILE__ ) . 'admin/css/playback-station-admin.css',
             array(), $this->version, FALSE);
 	} // enqueue_styles()
 

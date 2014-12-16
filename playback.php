@@ -14,10 +14,6 @@
 
 // PURPOSE: Registers the plugin with WordPress and sets everything in motion
 
-// if ( ! defined( 'DIL_PLAYBACK' ) ) {
-// 	die;
-// }
-
 require_once plugin_dir_path(__FILE__).'includes/class-playback-station.php';
 
 function run_playback_station()
