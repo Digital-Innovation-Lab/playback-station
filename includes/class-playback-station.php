@@ -46,6 +46,14 @@ class Playback_Station {
 	{
 			// Ensure we're viewing a Collections page
 	    // if ($post_type == 'pbs-collection') {
+	    		// Get rid of theme styles
+			wp_dequeue_style('screen');
+			wp_deregister_style('screen');
+			wp_dequeue_style('events-manager');
+
+			// wp_dequeue_script('site');
+			// wp_deregister_script('site');
+
 				// Load required JS libraries
 			wp_enqueue_script('jquery');
 			// wp_enqueue_script('modernizr');
@@ -54,11 +62,12 @@ class Playback_Station {
 
 			wp_enqueue_script('soundcloud-api', 'http://w.soundcloud.com/player/api.js');
 	    		// Load required styles
-			wp_enqueue_style('pbs-css', plugins_url('playback-station.css', dirname(__FILE__)), '', $this->version );
 			wp_enqueue_style('font-awesome', plugins_url('lib/font-awesome/css/font-awesome.min.css', dirname(__FILE__)), '', $this->version );
 			wp_enqueue_style('jquery-ui-css', plugins_url('lib/jquery-ui.css', dirname(__FILE__)), '', $this->version );
-			wp_enqueue_style('jquery-ui-struct-css', plugins_url('lib/jquery-ui.structure.css', dirname(__FILE__)), '', $this->version );
-			wp_enqueue_style('jquery-ui-theme-css', plugins_url('lib/jquery-ui.theme.css', dirname(__FILE__)), '', $this->version );
+			wp_enqueue_style('jquery-ui-struct-css', plugins_url('lib/jquery-ui.structure.css', dirname(__FILE__)), 'jquery-ui-css', $this->version );
+			wp_enqueue_style('jquery-ui-theme-css', plugins_url('lib/jquery-ui.theme.css', dirname(__FILE__)), 'jquery-ui-css', $this->version );
+			wp_enqueue_style('pbs-css', plugins_url('playback-station.css', dirname(__FILE__)), 
+				array('font-awesome', 'jquery-ui-css', 'jquery-ui-struct-css', 'jquery-ui-theme-css'), $this->version );
 		// }
 	} // pbs_load_scripts()
 
@@ -144,7 +153,8 @@ class Playback_Station {
 				'collections'	=> $collections
 			) );
 
-			$page_template = plugins_url('single-pbs-collection.php', dirname(__FILE__));
+			$page_template = dirname(__FILE__).'/../single-pbs-collection.php';
+			// $page_template = plugins_url('single-pbs-collection.php', dirname(__FILE__));
 		}
 		return $page_template;
 	} // pbs_page_template()

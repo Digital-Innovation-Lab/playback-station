@@ -1,3 +1,4 @@
+<?php wp_head(); ?>
 
   <header><i>Media and the Movement</i><span style="float: right">UNC Digital Innovation Lab >> Playback Station</span></header>
   <div class="HolyGrail-body">
@@ -54,4 +55,6 @@
         </div></div>
     </aside>
   </div>
-  <footer><i class="fa fa-step-backward"></i>&nbsp;&nbsp;<i class="fa fa-play-circle"></i>&nbsp;&nbsp;<i class="fa fa-step-forward"></i> <div class="play-slider"></div> <div id="play-time"></div></footer>
+  <footer></footer>
+
+<?php wp_footer(); ?>

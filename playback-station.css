@@ -20,7 +20,8 @@ html {
 body {
 	font-family: 'Gill Sans', 'Gill Sans MT', Calibri, sans-serif;
     font-size: 14px;
-    background-color: black;
+    background-color: black !important;
+    line-height: 1em;
 }
 
     /* For busy cursor */
@@ -40,12 +41,21 @@ footer {
     -ms-flex-direction: row;
     flex-direction: row;
 
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, sans-serif;
+    font-size: 14px;
+    background-color: black !important;
+    line-height: 1em;
+
     color: yellow;
     height: 30px;
     padding: 6px;
 }
 
 header {
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, sans-serif;
+    font-size: 14px;
+    background-color: black !important;
+
     width: 100%;
     color: yellow;
     padding: 4px;
@@ -89,6 +99,11 @@ header {
 }
 
 .HolyGrail-nav, .HolyGrail-activity {
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, sans-serif;
+    font-size: 14px;
+    background-color: black !important;
+    line-height: 1em;
+
     padding: 4px;
     border-radius: 3px;
     background: rgba(147, 128, 108, .1);
@@ -98,6 +113,24 @@ header {
     margin: 4px;
     padding: 0;
     margin-bottom: 7px;
+}
+
+    /* Search box */
+.HolyGrail-nav input[type=text] {
+    border: 2px solid yellow; 
+    -webkit-box-shadow: 
+      inset 0 0 8px  rgba(0,0,0,0.1),
+            0 0 16px rgba(0,0,0,0.1); 
+    -moz-box-shadow: 
+      inset 0 0 8px  rgba(0,0,0,0.1),
+            0 0 16px rgba(0,0,0,0.1); 
+    box-shadow: 
+      inset 0 0 8px  rgba(0,0,0,0.1),
+            0 0 16px rgba(0,0,0,0.1); 
+    padding: 2px;
+    background: rgba(255,255,255,0.8);
+    margin: 4px 2px 4px 0px;
+    font-size: 11px;
 }
 
 .HolyGrail-activity {
@@ -396,7 +429,7 @@ nav hr {
     width: 200px;
 
     height: 8px;
-    background: url('images/slider-bg.png');
+    background: url('lib/images/slider-bg.png');
 
     background-color: #8e8d8d;
 
@@ -421,14 +454,14 @@ footer .ui-slider-handle {
     margin-top: -2px;
     margin-left:-12px;
     z-index: 2;
-    background: url('images/handle.png') no-repeat 50% 50%;
+    background: url('lib/images/handle.png') no-repeat 50% 50%;
 
     position: absolute;
     top: -7px;
 }
 
 footer .ui-widget-header {
-    background: url('images/fill.png') no-repeat left;
+    background: url('lib/images/fill.png') no-repeat left;
     height:8px;
 /*
     left:1px;
