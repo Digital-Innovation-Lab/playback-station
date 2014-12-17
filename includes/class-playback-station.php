@@ -41,11 +41,19 @@ class Playback_Station {
 	} // cmp_titles()
 
 
-		// PURPOSE: Enqueue styles and scripts for template
-	public function pbs_load_scripts()
+		// PURPOSE:	Called by WP to modify output when viewing a page of any type
+		// INPUT:	$page_template = default path to file to use for template to render page
+		// RETURNS:	Modified $page_template setting (file path to new php template file)
+	public function pbs_page_template($page_template)
 	{
+		global $post;
+
+		$blog_id = get_current_blog_id();
+		$ajax_url = get_admin_url($blog_id ,'admin-ajax.php');
+		$post_type = get_query_var('post_type');
+
 			// Ensure we're viewing a Collections page
-	    // if ($post_type == 'pbs-collection') {
+	    if ($post_type == 'pbs-collection') {
 	    		// Get rid of theme styles
 			wp_dequeue_style('screen');
 			wp_deregister_style('screen');
@@ -68,37 +76,21 @@ class Playback_Station {
 			wp_enqueue_style('jquery-ui-theme-css', plugins_url('lib/jquery-ui.theme.css', dirname(__FILE__)), 'jquery-ui-css', $this->version );
 			wp_enqueue_style('pbs-css', plugins_url('playback-station.css', dirname(__FILE__)), 
 				array('font-awesome', 'jquery-ui-css', 'jquery-ui-struct-css', 'jquery-ui-theme-css'), $this->version );
-		// }
-	} // pbs_load_scripts()
 
-
-		// PURPOSE:	Called by WP to modify output when viewing a page of any type
-		// INPUT:	$page_template = default path to file to use for template to render page
-		// RETURNS:	Modified $page_template setting (file path to new php template file)
-	public function pbs_page_template($page_template)
-	{
-		global $post;
-
-		$blog_id = get_current_blog_id();
-		$ajax_url = get_admin_url($blog_id ,'admin-ajax.php');
-		$post_type = get_query_var('post_type');
-
-			// Ensure we're viewing a Collections page
-	    if ($post_type == 'pbs-collection') {
 				// Compile array of all tracks
 			$tracks = array();
-			$args = array('post_type' => 'dhp-track', 'posts_per_page' => -1);
+			$args = array('post_type' => 'pbs-track', 'posts_per_page' => -1);
 			$loop = new WP_Query($args);
 			while ($loop->have_posts()) : $loop->the_post();
 				$track = array();
-				$marker_id = get_the_ID();
+				$track_id = get_the_ID();
 
 					// Get the custom field values
-				$track["id"] = get_post_meta($markerID, "pbs-id", true);
-				$track["title"] = get_post_meta($markerID, "pbs-title", true);
-				$track["url"] = get_post_meta($markerID, "pbs-url", true);
-				$track["length"] = get_post_meta($markerID, "length", true);
-				$track["trans"] = get_post_meta($markerID, "trans", true);
+				$track["id"] = get_post_meta($track_id, "pbs-id", true);
+				$track["title"] = get_post_meta($track_id, "pbs-title", true);
+				$track["url"] = get_post_meta($track_id, "pbs-url", true);
+				$track["length"] = get_post_meta($track_id, "length", true);
+				$track["trans"] = get_post_meta($track_id, "trans", true);
 				array_push($tracks, $track);
 			endwhile;
 				// Sort by ID
@@ -106,26 +98,26 @@ class Playback_Station {
 
 				// Compile array of all collections
 			$collections = array();
-			$args = array('post_type' => 'dhp-collection', 'posts_per_page' => -1);
+			$args = array('post_type' => 'pbs-collection', 'posts_per_page' => -1);
 			$loop = new WP_Query($args);
 			while ($loop->have_posts()) : $loop->the_post();
 				$collection = array();
-				$marker_id = get_the_ID();
+				$coll_id = get_the_ID();
 
 					// Get the custom field values
-				$coll_type = get_post_meta($markerID, "pbs-type", true);
-				$collection["title"] = get_post_meta($markerID, "pbs-title", true);
-				$collection["icon"] = get_post_meta($markerID, "pbs-icon", true);
+				$coll_type = get_post_meta($coll_id, "pbs-type", true);
+				$collection["title"] = get_post_meta($coll_id, "pbs-title", true);
+				$collection["icon"] = get_post_meta($coll_id, "pbs-icon", true);
 				$collection["abstract"] = get_the_content();
-				$collection["details"] = get_post_meta($markerID, "details", true);
-				$collection["tracks"] = get_post_meta($markerID, "tracks", true);
+				$collection["details"] = get_post_meta($coll_id, "details", true);
+				$collection["tracks"] = get_post_meta($coll_id, "tracks", true);
 
 					// Find entry for collection type in array, or create it
 				$found = false;
 				$size = count($collections);
 				for ($i = 0; $i < $size; $i++) {
-					if ($collections[i]["type"] == $coll_type) {
-						array_push($collections[i]["items"], $collection);
+					if ($collections[$i]["type"] == $coll_type) {
+						array_push($collections[$i]["items"], $collection);
 						$found = true;
 						break;
 					}
@@ -139,7 +131,7 @@ class Playback_Station {
 			endwhile;
 				// Sort each collection array by title
 			for ($i=0; $i < count($collections); $i++) {
-				usort($collections[i]["items"], array('Playback_Station', 'cmp_titles'));
+				usort($collections[$i]["items"], array('Playback_Station', 'cmp_titles'));
 			}
 
 				// Enqueue page JS last, after we've determine what dependencies might be
@@ -264,7 +256,6 @@ class Playback_Station {
 		// PURPOSE: Add hooks related to Page display
 	private function define_page_hooks()
 	{
-		$this->loader->add_action('wp_enqueue_scripts', $this, 'pbs_load_scripts');
 		$this->loader->add_filter('single_template', $this, 'pbs_page_template');
 	} // define_page_hooks()
 
