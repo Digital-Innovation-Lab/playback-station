@@ -8,7 +8,7 @@
 * License: GPLv2 or later
 * License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Single Post Meta Manager displays the post meta data associated with a given post.
+Playback Station gives easy access to digital media collections.
 
 ## Description
 
