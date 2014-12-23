@@ -3,28 +3,25 @@
 // PURPOSE: Core plugin file that maintains version info, plugin slug info, coordinates loader, ...
 
 // NOTES:   Implementation leverages WordPress by creating two custom post types, each of which
-//				contains a specific set of custom fields:
+//				contains a specific set of custom fields. (These are names in AJAX-JSON data)
 //			TRACK:
 //				pbs-id:		a unique ID for the track (just "id" in JSON for JS)
 //				pbs-title:	title to display for track (just "title" in JSON for JS)
+//				abstract:	abstract for track (the_content)
 //				pbs-url:	url to audio recording (just "url" in JSON for JS)
 //				length:		length of track in form HH:MM:SS.ms
 //				trans:		url to transcript file
-//				abstract:	string containing abstract for track
 //			COLLECTION:
 //				pbs-title:	title to display for track (just "title" in JSON for JS)
+//				abstract:	text to display as abstract for collection (the_content)
 //				pbs-icon:	url to icon to display for collection (just "icon" in JSON for JS)
 //				pbs-type:	'year', 'station', 'person', 'essay', or 'topic' (just "type" in JSON for JS)
-//				abstract:	text to display as abstract for collection (the_content)
 //				details:	url to text file to display for details
 //				tracks:		cs list of track IDs
 
 class Playback_Station {
-
 	protected $loader;
-
 	protected $plugin_slug;
-
 	protected $version;
 
 		// PURPOSE: Compare two IDs for sorting
@@ -181,7 +178,7 @@ class Playback_Station {
 			'hierarchical' => false,
 			'menu_position' => null,
 			/* if hierarchical, then may want to add 'page-attributes' to supports */
-			'supports' => array( 'title', 'thumbnail', 'revisions', 'custom-fields' )
+			'supports' => array('title', 'editor', 'thumbnail', 'revisions', 'custom-fields')
 		); 
 		register_post_type('pbs-track', $args);
 
@@ -211,7 +208,7 @@ class Playback_Station {
 			'hierarchical' => false,
 			'menu_position' => null,
 			/* if hierarchical, then may want to add 'page-attributes' to supports */
-			'supports' => array( 'title', 'thumbnail', 'revisions', 'custom-fields' )
+			'supports' => array('title', 'editor', 'thumbnail', 'revisions', 'custom-fields')
 		);
 		register_post_type('pbs-collection', $args);
 	} // add_custom_post_types()
