@@ -23,8 +23,8 @@ jQuery(document).ready(function($) {
 
 		// Current selection (indices and values); -1 = none for indices, '' = none for selections
 	var indexCollType, selCollType;
-	var indexCollection='', selCollection=-1;
-	var indexTrack='', selTrack=-1;
+	var indexCollection=-1, selCollection='';
+	var indexTrack=-1, selTrack='';
 
     	// For processing transcriptions
     var parseTimeCode 	= /(\d\d)\:(\d\d)\:(\d\d)\.(\d\d?)/;         // an exacting regular expression for parsing time
@@ -226,7 +226,7 @@ jQuery(document).ready(function($) {
     } // getTrackByID()
 
 
-		// PURPOSE: Display list of collections given current collection type selection
+		// PURPOSE: Refresh collections display given current collection type selection
         // ASSUMES: There is always some valid selection in selCollType
 	function displayAllCollections()
 	{
@@ -239,7 +239,7 @@ jQuery(document).ready(function($) {
 		});
         if (collSet) {
                 // Add each collection to the list
-            _.each(collSet, function(collEntry, collIndex) {
+            _.each(collSet.items, function(collEntry, collIndex) {
                 var htmlEntry = '<div class="play-result" data-index="'+collIndex+'">'+collEntry.title+
                                 '</div>';
                 $('#play-results').append(htmlEntry);
@@ -248,7 +248,7 @@ jQuery(document).ready(function($) {
 	} // displayAllCollections()
 
 
-		// PURPOSE: Display all materials relating to current collection selection
+		// PURPOSE: Refresh collection display given current collection selection
 	function displayACollection()
 	{
         $('#main-top-view').empty();
@@ -270,13 +270,24 @@ jQuery(document).ready(function($) {
             _.each(trackList, function(theTrackID, trackIndex) {
                 var theTrack = getTrackByID(theTrackID);
                 var htmlEntry = '<div class="track-entry" data-id="'+theTrack.id+'" data-index="'+trackIndex+
-                                '"><input type="checkbox" name="'+theTrack.id+'"><div class="track-title"><i class="fa fa-play-circle"></i>'+
+                                '"><input type="checkbox" name="'+theTrack.id+'"><div class="track-title"><i class="fa fa-play-circle"></i> '+
                                 theTrack.title+'</div><div class="track-time"> '+theTrack.length+
                                 ' </div><div class="track-credits">'+theTrack.abstract+'</div>';
                 $('#track-table').append(htmlEntry);
             });
         }
 	} // displayACollection()
+
+
+        // PURPOSE: Refresh track display given current track selection
+    function displayATrack()
+    {
+        $('#transcription-table').empty();
+
+        if (indexTrack >= 0) {
+            // TO DO: Load and parse transcription
+        }
+    } // displayATrack()
 
 
 		// PURPOSE: Bind code that handles selecting a collection type
@@ -290,7 +301,6 @@ jQuery(document).ready(function($) {
 console.log("Search for ...");
             } else {
     			if (selIndex != indexCollType) {
-console.log("Select collection type: "+selCType);
     					// Update visuals
     				$('.play-option').removeClass('selected');
     				$(evt.target).addClass('selected');
@@ -302,13 +312,10 @@ console.log("Select collection type: "+selCType);
                     indexCollection = -1; selCollection = '';
                     indexTrack = -1; selTrack = '';
 
-                        // TO DO: Clear out track listings
-                        // TO DO: Clear out current selected collection window
-                        // TO DO: Clear out Details tab contents
-                        // TO DO: Clear out Transcript tab contents
-
-    					// Show relevant collection materials
+    					// Show relevant collections of this type
     				displayAllCollections();
+                        // Clear out specific collection info
+                    displayACollection();
                 }
 			}
 		});
@@ -324,15 +331,11 @@ console.log("Select collection type: "+selCType);
 				selIndex = parseInt(selIndex);
 				if (selIndex != indexCollection) {
 						// Update visuals
-					$('.play-result[data-index="'+selIndex+'"]').removeClass('selected');
+					$('.play-result').removeClass('selected');
 					$(evt.target).addClass('selected');
 						// Set selection variables
 					selCollection = $(evt.target).text();
 					indexCollection = selIndex;
-                    // TO DO: Clear out track listings
-                    // TO DO: Clear out current selected collection window
-                    // TO DO: Clear out Details tab contents
-                    // TO DO: Clear out Transcript tab contents
 
 						// Display all material about selected collection
                     displayACollection();
@@ -350,30 +353,29 @@ console.log("Select collection type: "+selCType);
 			if (trackSel) {
 				var selIndex = $(trackSel).data('index');
 				selIndex = parseInt(selIndex);
-                selID = $(trackSel).data('id');
 				if (selIndex != indexTrack) {
+                    selID = $(trackSel).data('id');
 						// Update visuals
 					$('.track-entry[data-index="'+selIndex+'"]').removeClass('playing');
 					$(evt.target).addClass('playing');
 						// Set selection variables
 					indexTrack = selIndex;
 						// TO DO: Set SoundCloud to play
-                        // TO DO: Clear out Transcript tab contents
-                        // TO DO: Load track transcript into Transcript tab contents
+                    displayATrack();
 				}
 			}
 		});
 	} // bindSelectTrack()
 
 
-		// PURPOSE: Bind code to handle playback widget controls
+		// PURPOSE: Bind code to handle SoundCloud widget controls
 	function bindSelectPlayer()
 	{
 
 	} // bindSelectPlayer()
 
 
-        // PURPOSE: Bind code to handle searches
+        // PURPOSE: Bind code to handle search GUI elements
     function bindSearch()
     {
 
@@ -402,5 +404,6 @@ console.log("Select collection type: "+selCType);
     bindSelectTrack();
     bindSelectPlayer();
     bindSearch();
+    bindUserCollection();
     bindTranscrSeek();
 });
