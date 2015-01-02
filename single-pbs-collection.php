@@ -18,9 +18,9 @@
             <div id="tab-details" class="tab-content">
             </div>
             <div id="tab-transcript" class="tab-content">
-                <p>Transcript for Song Title</p>
+                <p>Track Transcript</p>
                 <p><input type="checkbox" id="transcSyncOn" name="transcSyncOn" checked> Scroll transcript to follow playback</p>
-                <div id="transcription-table">
+                <div id="transcr-table">
                 </div>
             </div>
         </div>

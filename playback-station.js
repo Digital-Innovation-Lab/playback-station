@@ -14,7 +14,6 @@
 // TO DO:   Insert SoundCloud controls into DOM
 //          Add "Update" button to user collection area for un-selecting tracks?
 //          Handle coming to end of track currently playing: automatically play next if from collection
-//          Handle all user selections
 
 jQuery(document).ready(function($) {
 		// access data compiled by plugin's PHP code
@@ -151,8 +150,6 @@ jQuery(document).ready(function($) {
         // INPUT:   transcriptData = quicktime text format: timestamps on separate lines, [HH:MM:SS.m]
     function formatTranscript(transcriptData)
 	{
-			// Remove whatever transcript currently exists
-    	$('#transcr-table').empty();
             // empty time code array -- each entry has start & end
         tcArray = [];
         rowIndex = -1;
@@ -163,8 +160,8 @@ jQuery(document).ready(function($) {
         // var splitTranscript = transcriptData.trim().split(/\r\n|\r|\n/g);       // More efficient but not working!
 
         if (splitTranscript) {
-            var timecode, lastStamp=0;
-            var tcIndex=0;
+            var tcIndex = 0;
+            var timeCode, lastCode=0, lastStamp=0;
             var textBlock='';
             _.each(splitTranscript, function(val) {
             		// Each entry is (1) empty/line break, (2) timestamp, or (3) text
@@ -172,18 +169,22 @@ jQuery(document).ready(function($) {
                     // Skip empty entries, which were line breaks
                 if (val.length>1) {
                     	// Encountered timestamp -- compile previous material, if any
-                    if (val.charAt(0) == '[') {
+                    if (val.charAt(0) === '[' && (val.charAt(1) >= '0' && val.charAt(1) <= '9'))
+                    {
                     	timecode = tcToMilliSeconds(val);
                     	if (textBlock.length) {
                     			// Append timecode entry once range is defined
                     		if (lastStamp) {
-                    			tcArray.push({ start: lastStamp, end: timecode });
+                    			tcArray.push({ start: lastCode, end: timeCode });
                     		}
 							$('#transcr-table').append('<div class="transcr-entry"><div class="transcr-timestamp" data-timecode="'+
-                        		timecode+'" data-tcindex="'+ tcIndex++ +'"></div><div class="transcr-text">'+textBlock+'</div></div>');
+                        		// timecode+'" data-tcindex="'+ tcIndex++ +'">'++'</div><div class="transcr-text">'+textBlock+'</div></div>');
+                                lastCode+'" data-tcindex="'+tcIndex++ +'">'+lastStamp+'</div><div class="type-text">'+textBlock+'</div></div>')
+
 							textBlock = '';
                     	}
-                    	lastStamp = timecode;
+                        lastStamp = val;
+                        lastCode = timeCode;
 
                     	// Encountered textblock
                     } else {
@@ -196,7 +197,7 @@ jQuery(document).ready(function($) {
 					// Append very large number to ensure can't go past last item! 9 hours * 60 minutes * 60 seconds * 1000 milliseconds
 				tcArray.push({ start: lastStamp, end: 32400000 });
 				$('#transcr-table').append('<div class="transcr-entry"><div class="transcr-timestamp" data-timecode="'+
-					lastStamp+'" data-tcindex="'+tcIndex+'"></div><div class="transcr-text">'+textBlock+'</div></div>');
+					lastCode+'" data-tcindex="'+tcIndex+'">'+lastStamp+'</div><div class="transcr-text">'+textBlock+'</div></div>');
 			}
         } // if (split)
     } // formatTranscript()
@@ -263,7 +264,13 @@ jQuery(document).ready(function($) {
             $('#main-top-view').append('<p><b>'+collEntry.title+'</b></p>');
             $('#main-top-view').append('<p>'+collEntry.abstract+'</p>');
 
-            // TO DO: Load collection details from file into #tab-details
+                // Load collection details from file into #tab-details
+            var xhr = new XMLHttpRequest();
+            xhr.onload = function(e) {
+                $('#tab-details').append('<p>'+xhr.responseText+'</p>');
+            }
+            xhr.open('GET', collEntry.details, true);
+            xhr.send();
 
                 // Display collection's list of tracks (in Tracks tab)
             var trackList = collEntry.tracks.split(',');
@@ -280,12 +287,24 @@ jQuery(document).ready(function($) {
 
 
         // PURPOSE: Refresh track display given current track selection
+        // NOTE:    indexTrack is the index on the current track list, not in the full tracks array
     function displayATrack()
     {
-        $('#transcription-table').empty();
+            // Empty out transcription table
+        $('#transcr-table').empty();
 
         if (indexTrack >= 0) {
-            // TO DO: Load and parse transcription
+                // Get the track info
+            var trackID = $('.track-entry[data-index="'+indexTrack+'"]').data('id');
+            var theTrack = getTrackByID(trackID);
+
+                // Load and parse transcript file
+            var xhr = new XMLHttpRequest();
+            xhr.onload = function(e) {
+                formatTranscript(xhr.responseText);
+            }
+            xhr.open('GET', theTrack.trans, true);
+            xhr.send();
         }
     } // displayATrack()
 
@@ -298,7 +317,8 @@ jQuery(document).ready(function($) {
 			selIndex = parseInt(selIndex);
             var selCType = $(evt.target).data('coll-type');
             if (selCType === 'search') {
-console.log("Search for ...");
+                // TO DO: Search for $('#search-text').val()
+
             } else {
     			if (selIndex != indexCollType) {
     					// Update visuals
@@ -349,6 +369,8 @@ console.log("Search for ...");
 	function bindSelectTrack()
 	{
 		$('#track-table').click(function(evt) {
+            // TO DO: Check if checkbox selection -- if so, don't do anything!
+
 			var trackSel = $(evt.target).closest('.track-entry').first();
 			if (trackSel) {
 				var selIndex = $(trackSel).data('index');
@@ -356,7 +378,8 @@ console.log("Search for ...");
 				if (selIndex != indexTrack) {
                     selID = $(trackSel).data('id');
 						// Update visuals
-					$('.track-entry[data-index="'+selIndex+'"]').removeClass('playing');
+					$('.track-entry').removeClass('playing');
+                    // $('.track-entry[data-index="'+selIndex+'"]').removeClass('playing');
 					$(evt.target).addClass('playing');
 						// Set selection variables
 					indexTrack = selIndex;
