@@ -27,12 +27,12 @@
     </main>
     <nav class="HolyGrail-nav">
         <p><b>PLAY</b></p>
-        <div class="play-option selected"><i class="play-icon fa fa-wifi"></i> Stations</div>
-        <div class="play-option"><i class="play-icon fa fa-calendar"></i> Years</div>
-        <div class="play-option"><i class="play-icon fa fa-male"></i> People</div>
-        <div class="play-option"><i class="play-icon fa fa-newspaper-o"></i> Essays</div>
-        <div class="play-option"><i class="play-icon fa fa-list"></i> Topics</div>
-        <div class="play-option"><i class="play-icon fa fa-search"></i> Search</div>
+        <div class="play-option selected" data-index="0" data-coll-type="station"><i class="play-icon fa fa-wifi"></i> Stations</div>
+        <div class="play-option" data-index="1" data-coll-type="year"><i class="play-icon fa fa-calendar"></i> Years</div>
+        <div class="play-option" data-index="2" data-coll-type="person"><i class="play-icon fa fa-male"></i> People</div>
+        <div class="play-option" data-index="3" data-coll-type="essay"><i class="play-icon fa fa-newspaper-o"></i> Essays</div>
+        <div class="play-option" data-index="4" data-coll-type="topic"><i class="play-icon fa fa-list"></i> Topics</div>
+        <div class="play-option" data-index="5" data-coll-type="search"><i class="play-icon fa fa-search"></i> Search</div>
         <div><input type="checkbox" name="search-title" value="search-title" checked="checked"/> Titles
             <input type="checkbox" name="search-abstracts" value="search-abstracts" checked="checked"/> Abstracts
         </div>

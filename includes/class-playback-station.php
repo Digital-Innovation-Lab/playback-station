@@ -3,21 +3,21 @@
 // PURPOSE: Core plugin file that maintains version info, plugin slug info, coordinates loader, ...
 
 // NOTES:   Implementation leverages WordPress by creating two custom post types, each of which
-//				contains a specific set of custom fields. (These are names in AJAX-JSON data)
+//				contains a specific set of custom fields. (Custom Field / AJAX-JSON data names)
 //			TRACK:
-//				pbs-id:		a unique ID for the track (just "id" in JSON for JS)
-//				pbs-title:	title to display for track (just "title" in JSON for JS)
-//				abstract:	abstract for track (the_content)
-//				pbs-url:	url to audio recording (just "url" in JSON for JS)
-//				length:		length of track in form HH:MM:SS.ms
-//				trans:		url to transcript file
+//				pbs-id/id:			a unique ID for the track
+//				pbs-title/title:	title to display for track
+//				/abstract:			abstract for track (the_content)
+//				pbs-url/url:		url to audio recording
+//				length:				length of track in form HH:MM:SS.ms
+//				trans:				url to transcript file
 //			COLLECTION:
-//				pbs-title:	title to display for track (just "title" in JSON for JS)
-//				abstract:	text to display as abstract for collection (the_content)
-//				pbs-icon:	url to icon to display for collection (just "icon" in JSON for JS)
-//				pbs-type:	'year', 'station', 'person', 'essay', or 'topic' (just "type" in JSON for JS)
-//				details:	url to text file to display for details
-//				tracks:		cs list of track IDs
+//				pbs-title/title:	title to display for track
+//				/abstract:			text to display as abstract for collection (the_content)
+//				pbs-icon/icon:		url to icon to display for collection
+//				pbs-type/type:		'year', 'station', 'person', 'essay', or 'topic'
+//				details:			url to text file to display for details
+//				tracks:				cs list of track IDs
 
 class Playback_Station {
 	protected $loader;
@@ -85,6 +85,7 @@ class Playback_Station {
 					// Get the custom field values
 				$track["id"] = get_post_meta($track_id, "pbs-id", true);
 				$track["title"] = get_post_meta($track_id, "pbs-title", true);
+				$track["abstract"] = get_the_content();
 				$track["url"] = get_post_meta($track_id, "pbs-url", true);
 				$track["length"] = get_post_meta($track_id, "length", true);
 				$track["trans"] = get_post_meta($track_id, "trans", true);
