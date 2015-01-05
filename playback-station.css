@@ -24,14 +24,6 @@ body {
     line-height: 1em;
 }
 
-hr {
-    padding: 0px;
-    margin: 0px;
-    margin-top: 4px;
-    margin-bottom: 4px;
-    color: white;
-}
-
     /* For busy cursor */
 body.waiting * {
     cursor: wait !important;
@@ -121,6 +113,18 @@ header {
     margin: 4px;
     padding: 0;
     margin-bottom: 7px;
+}
+
+
+.HolyGrail-nav hr, .HolyGrail-activity hr {
+    padding: 0px;
+    margin: 0px;
+    margin-top: 4px;
+    margin-bottom: 4px;
+    color: white !important;
+    line-height: 3px !important;
+    border: 1px solid;
+    height: 1px !important;
 }
 
     /* Search box */
@@ -402,6 +406,11 @@ nav hr {
 
 /* Transcriptions
  */
+
+#tab-transcript p {
+    line-height: 1.1em;
+    margin-bottom: 6px;
+}
 
 #transcr-table {
     display: table;
