@@ -310,6 +310,10 @@ nav hr {
     color: yellow;
 }
 
+.play-result.selected {
+    text-decoration: underline;
+}
+
     /* Main Content area ====================
      * main-top-view (icon, title and abstract)
      * main-tabbed (tabbed view)
@@ -372,6 +376,10 @@ nav hr {
     display: table-cell;
     padding-left: 3px;
     padding-right: 3px;
+}
+
+#track-table .track-title .fa-play-circle {
+    cursor: pointer;
 }
 
 .track-year {

@@ -369,23 +369,28 @@ jQuery(document).ready(function($) {
 	function bindSelectTrack()
 	{
 		$('#track-table').click(function(evt) {
-            // TO DO: Check if checkbox selection -- if so, don't do anything!
-
 			var trackSel = $(evt.target).closest('.track-entry').first();
 			if (trackSel) {
 				var selIndex = $(trackSel).data('index');
 				selIndex = parseInt(selIndex);
-				if (selIndex != indexTrack) {
-                    selID = $(trackSel).data('id');
-						// Update visuals
-					$('.track-entry').removeClass('playing');
-                    // $('.track-entry[data-index="'+selIndex+'"]').removeClass('playing');
-					$(evt.target).addClass('playing');
-						// Set selection variables
-					indexTrack = selIndex;
-						// TO DO: Set SoundCloud to play
-                    displayATrack();
-				}
+
+                    // Was the checkbox selected?
+                if ($(evt.target).is('input')) {
+
+                    // Was the play button selected?
+                } else if ($(evt.target).hasClass('fa-play-circle')) {
+                    if (selIndex != indexTrack) {
+                        selID = $(trackSel).data('id');
+                            // Update visuals
+                        $('.track-entry').removeClass('playing');
+                        // $('.track-entry[data-index="'+selIndex+'"]').removeClass('playing');
+                        trackSel.addClass('playing');
+                            // Set selection variables
+                        indexTrack = selIndex;
+                            // TO DO: Set SoundCloud to play
+                        displayATrack();
+                    }
+                }
 			}
 		});
 	} // bindSelectTrack()
