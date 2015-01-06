@@ -55,6 +55,7 @@
         </div></div>
     </aside>
   </div>
-  <footer></footer>
+  <footer>
+  </footer>
 
 <?php wp_footer(); ?>

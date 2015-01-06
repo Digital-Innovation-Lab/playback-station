@@ -11,9 +11,8 @@
 //					type: 		String
 //						items: 	Array of collections of this type sorted by title
 
-// TO DO:   Insert SoundCloud controls into DOM
-//          Add "Update" button to user collection area for un-selecting tracks?
-//          Handle coming to end of track currently playing: automatically play next if from collection
+// TO DO:   Add "Update" button to user collection area for un-selecting tracks?
+//          Handle coming to end of track currently playing: automatically play next if from collection??
 
 jQuery(document).ready(function($) {
 		// access data compiled by plugin's PHP code
@@ -32,7 +31,6 @@ jQuery(document).ready(function($) {
     	// For playback
     var rowIndex 		= -1;
     var playingNow 		= false;
-    var primeAudio 		= true;
     var playWidget 		= null;
 
 
@@ -44,6 +42,7 @@ jQuery(document).ready(function($) {
 
         _.find(tcArray, function(tcEntry, index) {
             match = (tcEntry.start <= millisecond && millisecond <= tcEntry.end);
+
             if (match) {
             		// Only change if this row not already highlighted
                 if (rowIndex != index) {
@@ -66,48 +65,16 @@ jQuery(document).ready(function($) {
     } // hightlightTranscriptLine()
 
 
-        // PURPOSE: Bind code to handle play, seek, close, etc.
-    function bindPlayerHandlers()
-    {
-			// Setup audio/transcript SoundCloud player after entire sound clip loaded
-        playWidget.bind(SC.Widget.Events.READY, function() {
-				// Prime the audio -- must initially play (seekTo won't work until sound loaded and playing)
-			playWidget.play();
-			playWidget.bind(SC.Widget.Events.PLAY, function() {
-				dhpWidget.playingNow = true;
-			});
-			playWidget.bind(SC.Widget.Events.PAUSE, function() {
-				dhpWidget.playingNow = false;
-			});
-
-			playWidget.bind(SC.Widget.Events.PLAY_PROGRESS, function(params) {
-					// Pauses audio after it primes so seekTo will work properly
-				if (dhpWidget.primeAudio) {
-					playWidget.pause();
-					primeAudio = false;
-					playingNow = false;
-				}
-				if (playingNow && tcArray.length > 0) {
-					hightlightTranscriptLine(params.currentPosition);
-				}
-			});
-				// Can't seek within the SEEK event because it causes infinite recursion
-            playWidget.bind(SC.Widget.Events.FINISH, function() {
-                playingNow = false;
-            });
-        });
-    } // bindPlayerHandlers()
-
-
         // PURPOSE: Bind code to handle seeking according to transcription selection
         // NOTES:   This is called by formatTranscript(), so only bound if a transcription exists
     function bindTranscrSeek()
     {
             // Allow user to click anywhere in player area; check if timecode, go to corresponding time
         $('#transcr-table').click(function(evt) {
-            if ($(evt.target).hasClass('transcr-timestamp') && playWidget) {
+            if (playWidget && $(evt.target).hasClass('transcr-timestamp')) {
             	var tcElement = $(evt.target).closest('.transcr-timestamp');
                 var seekToTime = $(tcElement).data('timecode');
+
                     // seekTo doesn't work unless sound is already playing
                 if (!playingNow) {
                     playingNow = true;
@@ -171,7 +138,7 @@ jQuery(document).ready(function($) {
                     	// Encountered timestamp -- compile previous material, if any
                     if (val.charAt(0) === '[' && (val.charAt(1) >= '0' && val.charAt(1) <= '9'))
                     {
-                    	timecode = tcToMilliSeconds(val);
+                    	timeCode = tcToMilliSeconds(val);
                     	if (textBlock.length) {
                     			// Append timecode entry once range is defined
                     		if (lastStamp) {
@@ -250,6 +217,8 @@ jQuery(document).ready(function($) {
 
 
 		// PURPOSE: Refresh collection display given current collection selection
+        // NOTES:   Each track has its unique ID in the data-id field
+        //              the data-index simply has # in this list (not in original array)
 	function displayACollection()
 	{
         $('#main-top-view').empty();
@@ -298,13 +267,53 @@ jQuery(document).ready(function($) {
             var trackID = $('.track-entry[data-index="'+indexTrack+'"]').data('id');
             var theTrack = getTrackByID(trackID);
 
-                // Load and parse transcript file
-            var xhr = new XMLHttpRequest();
-            xhr.onload = function(e) {
-                formatTranscript(xhr.responseText);
+                // Can track be found?
+            if (theTrack) {
+                    // Is there a transcript file?
+                if (theTrack.trans && theTrack.trans !== '') {
+                        // Load and parse transcript file
+                    var xhr = new XMLHttpRequest();
+                    xhr.onload = function(e) {
+                        formatTranscript(xhr.responseText);
+                    }
+                    xhr.open('GET', theTrack.trans, true);
+                    xhr.send();
+                } else {
+                    tcArray = [];
+                }
+                    // Is there a SoundCloud file?
+                if (theTrack.url && theTrack.url !== '') {
+                    var footer = $('footer');
+                    footer.empty();
+                    footer.append('<iframe id="scWidget" class="player" width="100%" height="120" src="http://w.soundcloud.com/player/?url='+
+                                theTrack.url+'"></iframe>');
+                    playWidget = SC.Widget(document.getElementById('scWidget'));
+
+                    playWidget.bind(SC.Widget.Events.READY, function() {
+                            // Select and highlight initial line of transcription
+                        rowIndex = 0;
+                        $('#transcr-table .transcr-timestamp[data-tcindex=0]').addClass('playing');
+
+                        playWidget.play();
+                        playWidget.bind(SC.Widget.Events.PLAY, function() {
+                            playingNow = true;
+                        });
+                        playWidget.bind(SC.Widget.Events.PAUSE, function() {
+                            playingNow = false;
+                        });
+
+                        playWidget.bind(SC.Widget.Events.PLAY_PROGRESS, function(params) {
+                            if (playingNow && tcArray.length > 0) {
+                                hightlightTranscriptLine(params.currentPosition);
+                            }
+                        });
+
+                        playWidget.bind(SC.Widget.Events.FINISH, function() {
+                            playingNow = false;
+                        });
+                    });
+                }
             }
-            xhr.open('GET', theTrack.trans, true);
-            xhr.send();
         }
     } // displayATrack()
 
@@ -380,13 +389,13 @@ jQuery(document).ready(function($) {
                     // Was the play button selected?
                 } else if ($(evt.target).hasClass('fa-play-circle')) {
                     if (selIndex != indexTrack) {
-                        selID = $(trackSel).data('id');
                             // Update visuals
                         $('.track-entry').removeClass('playing');
                         // $('.track-entry[data-index="'+selIndex+'"]').removeClass('playing');
                         trackSel.addClass('playing');
                             // Set selection variables
                         indexTrack = selIndex;
+                        selTrack = $(trackSel).data('id');
                             // TO DO: Set SoundCloud to play
                         displayATrack();
                     }

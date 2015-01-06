@@ -59,13 +59,6 @@ class Playback_Station {
 			// wp_dequeue_script('site');
 			// wp_deregister_script('site');
 
-				// Load required JS libraries
-			wp_enqueue_script('jquery');
-			// wp_enqueue_script('modernizr');
-			wp_enqueue_script('underscore');
-			wp_enqueue_script('jquery-ui', plugins_url('lib/jquery-ui.min.js', dirname(__FILE__)), 'jquery');
-
-			wp_enqueue_script('soundcloud-api', 'http://w.soundcloud.com/player/api.js');
 	    		// Load required styles
 			wp_enqueue_style('font-awesome', plugins_url('lib/font-awesome/css/font-awesome.min.css', dirname(__FILE__)), '', $this->version );
 			wp_enqueue_style('jquery-ui-css', plugins_url('lib/jquery-ui.css', dirname(__FILE__)), '', $this->version );
@@ -73,6 +66,14 @@ class Playback_Station {
 			wp_enqueue_style('jquery-ui-theme-css', plugins_url('lib/jquery-ui.theme.css', dirname(__FILE__)), 'jquery-ui-css', $this->version );
 			wp_enqueue_style('pbs-css', plugins_url('playback-station.css', dirname(__FILE__)), 
 				array('font-awesome', 'jquery-ui-css', 'jquery-ui-struct-css', 'jquery-ui-theme-css'), $this->version );
+
+				// Load required JS libraries
+			wp_enqueue_script('jquery');
+			// wp_enqueue_script('modernizr');
+			wp_enqueue_script('underscore');
+			wp_enqueue_script('jquery-ui', plugins_url('lib/jquery-ui.min.js', dirname(__FILE__)), 'jquery');
+
+			wp_enqueue_script('soundcloud-api', 'http://w.soundcloud.com/player/api.js');
 
 				// Compile array of all tracks
 			$tracks = array();
