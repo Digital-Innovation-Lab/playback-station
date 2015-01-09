@@ -168,9 +168,46 @@ header {
     padding: 0px;
 }
 
+    /* Area for User Collection */
+
+.HolyGrail-activity button {
+   border-top: 1px solid #96d1f8;
+   background: #65a9d7;
+   background: -webkit-gradient(linear, left top, left bottom, from(#3e779d), to(#65a9d7));
+   background: -webkit-linear-gradient(top, #3e779d, #65a9d7);
+   background: -moz-linear-gradient(top, #3e779d, #65a9d7);
+   background: -ms-linear-gradient(top, #3e779d, #65a9d7);
+   background: -o-linear-gradient(top, #3e779d, #65a9d7);
+   padding: 5px 10px;
+   -webkit-border-radius: 8px;
+   -moz-border-radius: 8px;
+   border-radius: 8px;
+   -webkit-box-shadow: rgba(0,0,0,1) 0 1px 0;
+   -moz-box-shadow: rgba(0,0,0,1) 0 1px 0;
+   box-shadow: rgba(0,0,0,1) 0 1px 0;
+   text-shadow: rgba(0,0,0,.4) 0 1px 0;
+   color: white;
+   font-size: 12px;
+   text-decoration: none;
+   vertical-align: middle;
+
+   margin-left: 4px;
+}
+
+.HolyGrail-activity button:hover {
+   border-top-color: #28597a;
+   background: #28597a;
+   color: #ccc;
+}
+
+.HolyGrail-activity button:active {
+   border-top-color: #1b435e;
+   background: #1b435e;
+}
+
     /* Bottom part of right sidebar */
 #pbs-user-container {
-    height: 340px;
+    height: 320px;
     overflow-y: auto;
 }
 
@@ -178,7 +215,6 @@ header {
     overflow: hidden;
 }
 
-    /* Area for User Collection */
 #pbs-user-collection p {
     margin-top: 2px;
     margin-bottom: 2px;
@@ -187,7 +223,6 @@ header {
 #pbs-user-collection .track-select {
     cursor: pointer;
 }
-
 
     /* Specific screen/media optimizations =============
      */
@@ -413,7 +448,8 @@ nav hr {
 }
 
 #transcr-table {
-    display: table;
+/*    display: table; */
+/*    overflow-y: scroll; */
     border-spacing: 8px 4px;
 }
 

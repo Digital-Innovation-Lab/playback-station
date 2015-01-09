@@ -42,10 +42,10 @@ class Playback_Station_Admin {
 		$trans = get_post_meta($post->ID, 'trans', true);
 			// Create HTML for metaboxes
 ?>
-<p>Unique ID for track <input type="text" name="pbs-id" id="pbs-id" size="16" value="<?php echo $pbs_id; ?>"> </p>
-<p>Title for track <input type="text" name="pbs-title" id="pbs-title" size="48" value="<?php echo $pbs_title; ?>"> </p>
+<p>Unique ID for Track <input type="text" name="pbs-id" id="pbs-id" size="16" value="<?php echo $pbs_id; ?>"> </p>
+<p>Title for Track <input type="text" name="pbs-title" id="pbs-title" size="48" value="<?php echo $pbs_title; ?>"> </p>
 <p>URL to audio recording <input type="text" name="pbs-url" id="pbs-url" size="48" value="<?php echo $pbs_url; ?>"> </p>
-<p>Length of track <input type="text" name="pbs-length" id="pbs-length" size="11" placeholder="HH:MM:SS.ms" value="<?php echo $length; ?>"> </p>
+<p>Length of Track <input type="text" name="pbs-length" id="pbs-length" size="11" placeholder="HH:MM:SS.ms" value="<?php echo $length; ?>"> </p>
 <p>URL to transcript <input type="text" name="pbs-trans" id="pbs-trans" size="48" value="<?php echo $trans; ?>"> </p>
 <?php
 	} // render_track_meta_boxes()
@@ -65,7 +65,7 @@ class Playback_Station_Admin {
 		$tracks = get_post_meta($post->ID, 'tracks', true);
 			// Create HTML for metaboxes
 ?>
-<p>Title for collection <input type="text" name="pbs-title" id="pbs-title" size="32" value="<?php echo $pbs_title; ?>"> </p>
+<p>Title for Collection <input type="text" name="pbs-title" id="pbs-title" size="32" value="<?php echo $pbs_title; ?>"> </p>
 <p>URL to icon <input type="text" name="pbs-icon" id="pbs-icon" size="48" value="<?php echo $pbs_icon; ?>"> </p>
 <p>Collection type <select name="pbs-type" id="pbs-type">
 	<option value="year" <?php if (isset($pbs_type)) selected($pbs_type, 'year'); ?>>Year</option>
@@ -150,4 +150,12 @@ class Playback_Station_Admin {
 		}
     } // save_post()
 
+	// PURPOSE: Ensure that txt and png files are able to be added to the Media Library
+	public function add_mime_types($mime_types)
+	{
+	    $mime_types['txt'] = 'text/plain';
+	    $mime_types['csv'] = 'text/csv';
+
+	    return $mime_types;
+	} // add_mime_types()
 } // class Playback_Station_Admin

@@ -11,8 +11,7 @@
 //					type: 		String
 //						items: 	Array of collections of this type sorted by title
 
-// TO DO:   Add "Update" button to user collection area for un-selecting tracks?
-//          Handle coming to end of track currently playing: automatically play next if from collection??
+// TO DO:   Handle coming to end of track currently playing: automatically play next if from collection??
 
 jQuery(document).ready(function($) {
 		// access data compiled by plugin's PHP code
@@ -46,17 +45,18 @@ jQuery(document).ready(function($) {
             if (match) {
             		// Only change if this row not already highlighted
                 if (rowIndex != index) {
+                    var transTable = $('#transcr-table');
                         // Should we synchronize audio and text transcript?
                     if (document.getElementById("transcSyncOn").checked) {
-                        var topDiff = $('#transcr-table .transcr-timestamp[data-tcindex="'+index+'"]').offset().top -
-                        				$('#transcr-table').offset().top;
-                        var scrollPos = $('#transcr-table').scrollTop() + topDiff;
-                        $('#transcr-table').animate({ scrollTop: scrollPos }, 300);
+                        var topDiff = transTable.find('.transcr-timestamp[data-tcindex="'+index+'"]').offset().top -
+                        				transTable.offset().top;
+                        var scrollPos = transTable.scrollTop() + topDiff;
+                        $('#tab-transcript').animate({ scrollTop: scrollPos }, 300);
                     }
                     if (rowIndex >= 0) {
-	                	$('#transcr-table .transcr-timestamp[data-tcindex="'+rowIndex+'"]').removeClass('playing');                    	
+	                	transTable.find('.transcr-timestamp[data-tcindex="'+rowIndex+'"]').removeClass('playing');                    	
                     }
-	                $('#transcr-table .transcr-timestamp[data-tcindex="'+index+'"]').addClass('playing');
+	                transTable.find('.transcr-timestamp[data-tcindex="'+index+'"]').addClass('playing');
                     rowIndex = index;
                 }
             }
@@ -236,7 +236,7 @@ jQuery(document).ready(function($) {
                 // Load collection details from file into #tab-details
             var xhr = new XMLHttpRequest();
             xhr.onload = function(e) {
-                $('#tab-details').append('<p>'+xhr.responseText+'</p>');
+                $('#tab-details').append(xhr.responseText);
             }
             xhr.open('GET', collEntry.details, true);
             xhr.send();
@@ -396,7 +396,6 @@ jQuery(document).ready(function($) {
                             // Set selection variables
                         indexTrack = selIndex;
                         selTrack = $(trackSel).data('id');
-                            // TO DO: Set SoundCloud to play
                         displayATrack();
                     }
                 }
@@ -419,10 +418,12 @@ jQuery(document).ready(function($) {
     } // bindSearch()
 
 
-        // PURPOSE: Bind code to handle User collections
+        // PURPOSE: Bind code to handle updating User collections
     function bindUserCollection()
     {
-            // TO DO
+        $('#update-user-collection').click(function(evt) {
+console.log("Update!");
+        });
     } // bindUserCollection()
 
 

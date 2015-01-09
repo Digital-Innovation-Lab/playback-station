@@ -249,6 +249,7 @@ class Playback_Station {
 		$this->loader->add_action('admin_enqueue_scripts', $admin, 'enqueue_styles');
 		$this->loader->add_action('add_meta_boxes', $admin, 'add_meta_boxes');
 		$this->loader->add_action('save_post', $admin, 'save_post');
+		$this->loader->add_action('upload_mimes', $admin, 'add_mime_types');
 	} // define_admin_hooks()
 
 
