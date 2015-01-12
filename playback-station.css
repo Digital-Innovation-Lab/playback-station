@@ -169,7 +169,6 @@ header {
 }
 
     /* Area for User Collection */
-
 .HolyGrail-activity button {
    border-top: 1px solid #96d1f8;
    background: #65a9d7;
@@ -207,7 +206,8 @@ header {
 
     /* Bottom part of right sidebar */
 #pbs-user-container {
-    height: 320px;
+    margin-top: 4px;
+    height: 322px;
     overflow-y: auto;
 }
 
@@ -216,12 +216,12 @@ header {
 }
 
 #pbs-user-collection p {
-    margin-top: 2px;
-    margin-bottom: 2px;
+    margin-top: 2px !important;
+    margin-bottom: 2px !important;
+    line-height: 1.1em;
 }
 
-#pbs-user-collection .track-select {
-    cursor: pointer;
+#pbs-user-collection .track-select-title {
 }
 
     /* Specific screen/media optimizations =============
@@ -330,15 +330,17 @@ nav hr {
     padding: 0px;
 }
 
-.play-results-container {
+#play-results-container {
     height: 375px;
     overflow-y: auto;
+    overflow-x: hidden;
     padding: 4px;
     margin: 0px;
 }
 
 #play-results {
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: hidden;
 }
 
 .play-result {

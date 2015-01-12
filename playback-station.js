@@ -10,8 +10,10 @@
 //				collections: 	Array of all collection objects
 //					type: 		String
 //						items: 	Array of collections of this type sorted by title
+//          Local user storage: CSV list of unique Track IDs (in sorted order) using key "pbs-tracks"
 
 // TO DO:   Handle coming to end of track currently playing: automatically play next if from collection??
+//          User selections
 
 jQuery(document).ready(function($) {
 		// access data compiled by plugin's PHP code
@@ -31,6 +33,10 @@ jQuery(document).ready(function($) {
     var rowIndex 		= -1;
     var playingNow 		= false;
     var playWidget 		= null;
+
+        // For user collections -- array of Track IDs, sorted in order
+    var pbsStorageKey   = 'pbs-user-collection';
+    var userTracks      = [];
 
 
         // PURPOSE: Given a millisecond reading, unhighlight any previous "playhead" and highlight new one
@@ -71,10 +77,9 @@ jQuery(document).ready(function($) {
     {
             // Allow user to click anywhere in player area; check if timecode, go to corresponding time
         $('#transcr-table').click(function(evt) {
-            if (playWidget && $(evt.target).hasClass('transcr-timestamp')) {
-            	var tcElement = $(evt.target).closest('.transcr-timestamp');
-                var seekToTime = $(tcElement).data('timecode');
-
+            var clickTime = $(evt.target);
+            if (playWidget && clickTime.hasClass('transcr-timestamp')) {
+                var seekToTime = clickTime.data('timecode');
                     // seekTo doesn't work unless sound is already playing
                 if (!playingNow) {
                     playingNow = true;
@@ -242,14 +247,18 @@ jQuery(document).ready(function($) {
             xhr.send();
 
                 // Display collection's list of tracks (in Tracks tab)
+            var trackEntry, pos, html, checked;
             var trackList = collEntry.tracks.split(',');
             _.each(trackList, function(theTrackID, trackIndex) {
-                var theTrack = getTrackByID(theTrackID);
-                var htmlEntry = '<div class="track-entry" data-id="'+theTrack.id+'" data-index="'+trackIndex+
-                                '"><input type="checkbox" name="'+theTrack.id+'"><div class="track-title"><i class="fa fa-play-circle"></i> '+
-                                theTrack.title+'</div><div class="track-time"> '+theTrack.length+
-                                ' </div><div class="track-credits">'+theTrack.abstract+'</div>';
-                $('#track-table').append(htmlEntry);
+                trackEntry = getTrackByID(theTrackID);
+                    // Check to see if this track is in user collection, and check if so
+                pos = _.sortedIndex(userTracks, theTrackID);
+                checked = userTracks[pos] === theTrackID ? 'checked' : '';
+                html = '<div class="track-entry" data-id="'+theTrackID+'" data-index="'+trackIndex+
+                                '"><input type="checkbox" name="'+theTrackID+'" '+checked+'><div class="track-title"><i class="fa fa-play-circle"></i> '+
+                                trackEntry.title+'</div><div class="track-time"> '+trackEntry.length+
+                                ' </div><div class="track-credits">'+trackEntry.abstract+'</div>';
+                $('#track-table').append(html);
             });
         }
 	} // displayACollection()
@@ -318,6 +327,22 @@ jQuery(document).ready(function($) {
     } // displayATrack()
 
 
+        // PURPOSE: Display user collection in right sidebar
+    function displayUserCollection()
+    {
+        var userCollection = $('#pbs-user-collection');
+        var trackEntry, html;
+        userCollection.empty();
+        _.each(userTracks, function(trackID, theIndex) {
+            trackEntry = getTrackByID(trackID);
+            html = '<p class="user-track" data-id="'+trackID+'" data-index="'+theIndex+
+                '"><input class="user-track-select" type="checkbox" checked="checked"/> <span class="track-select-title">'+
+                trackEntry.title+'</span></p>';
+            userCollection.append(html);
+        });
+    } // displayUserCollection()
+
+
 		// PURPOSE: Bind code that handles selecting a collection type
 	function bindSelectCollType()
 	{
@@ -383,11 +408,8 @@ jQuery(document).ready(function($) {
 				var selIndex = $(trackSel).data('index');
 				selIndex = parseInt(selIndex);
 
-                    // Was the checkbox selected?
-                if ($(evt.target).is('input')) {
-
                     // Was the play button selected?
-                } else if ($(evt.target).hasClass('fa-play-circle')) {
+                if ($(evt.target).hasClass('fa-play-circle')) {
                     if (selIndex != indexTrack) {
                             // Update visuals
                         $('.track-entry').removeClass('playing');
@@ -404,26 +426,93 @@ jQuery(document).ready(function($) {
 	} // bindSelectTrack()
 
 
-		// PURPOSE: Bind code to handle SoundCloud widget controls
-	function bindSelectPlayer()
-	{
+        // PURPOSE: Actually perform search functions and display resulting track names
+    function doSearch()
+    {
+            // TO DO: Unhighlight and clear collection selection
+            // TO DO: Search through list of tracks        
+    } // doSearch()
 
-	} // bindSelectPlayer()
 
-
-        // PURPOSE: Bind code to handle search GUI elements
+        // PURPOSE: Bind code to handle search GUI elements on carriage return in edit box
+        // NOTE:    Selection from Search button handled in bindSelectCollType
     function bindSearch()
     {
-
+        // TO DO
     } // bindSearch()
+
+
+        // RETURNS: true if the browser supports local storage
+    function supportsLocalStorage()
+    {
+        try {
+            return 'localStorage' in window && window['localStorage'] !== null;
+        } catch (e) {
+            return false;
+        }
+    } // supportsLocalStorage()
+
+
+        // PURPOSE: Parse list of tracks in user collection, put into userTracks[]
+    function parseStoredTracks()
+    {
+        var trackList = localStorage.getItem(pbsStorageKey);
+        if (trackList) {
+                // split by comma
+            userTracks = trackList.split(',');
+        } else {
+            userTracks = [];
+        }
+    } // parseStoredTracks()
+
+
+        // PURPOSE: Insert trackID into the userTracks array in sorted order
+        // NOTES:   Do not allow duplicates
+    function insertUserTrack(trackID)
+    {
+        if (userTracks.length) {
+            var pos = _.sortedIndex(userTracks, trackID);
+            if (userTracks[pos] !== trackID) {
+                userTracks.splice(pos, 0, trackID);
+            }
+        } else {
+            userTracks.push(trackID);
+        }
+    } // insertUserTrack()
 
 
         // PURPOSE: Bind code to handle updating User collections
     function bindUserCollection()
     {
-        $('#update-user-collection').click(function(evt) {
-console.log("Update!");
-        });
+        if (supportsLocalStorage()) {
+            parseStoredTracks();
+            displayUserCollection();
+
+                // Handle Update button: 
+                // Update userTracks and local storage based on current checkboxes
+            $('#update-user-collection').click(function(evt) {
+                userTracks = [];
+                var trackList, trackID;
+                    // Get list from the right sidebar and insert in order
+                trackList = $('#pbs-user-collection .user-track-select:checked');
+                _.each(trackList, function(trackSelect) {
+                    trackID = $(trackSelect).parent().data("id");
+                    insertUserTrack(trackID);
+                });
+
+                    // Get list from current collection track list and insert in order
+                trackList = $('#track-table .track-entry input:checked');
+                _.each(trackList, function(trackSelect) {
+                    trackID = $(trackSelect).parent().data("id");
+                    insertUserTrack(trackID);
+                });
+
+                    // Save results in browser's local storage
+                localStorage[pbsStorageKey] = userTracks.join(',');
+                    // Now, refresh display
+                displayUserCollection();
+            });
+        }
     } // bindUserCollection()
 
 
@@ -440,7 +529,6 @@ console.log("Update!");
     bindSelectCollType();
     bindSelectCollection();
     bindSelectTrack();
-    bindSelectPlayer();
     bindSearch();
     bindUserCollection();
     bindTranscrSeek();
