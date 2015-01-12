@@ -18,7 +18,7 @@
             <div id="tab-details" class="tab-content">
             </div>
             <div id="tab-transcript" class="tab-content">
-                <p>Track Transcript</p>
+                <p id="track-transcript-title"></p>
                 <p><input type="checkbox" id="transcSyncOn" name="transcSyncOn" checked> Scroll transcript to follow playback</p>
                 <div id="transcr-table">
                 </div>

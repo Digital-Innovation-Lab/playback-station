@@ -13,7 +13,6 @@
 //          Local user storage: CSV list of unique Track IDs (in sorted order) using key "pbs-tracks"
 
 // TO DO:   Handle coming to end of track currently playing: automatically play next if from collection??
-//          User selections
 
 jQuery(document).ready(function($) {
 		// access data compiled by plugin's PHP code
@@ -190,11 +189,11 @@ jQuery(document).ready(function($) {
 
         // PURPOSE: Retrieve a particular track by id
         // TO DO:   Make more efficient by taking advantage of sorted track names
-    function getTrackByID(id)
+    function getTrackByID(trackID)
     {
-        id = id.trim();
+        trackID = trackID.trim();
         return _.find(tracks, function(theTrack) {
-            return id === theTrack.id;
+            return trackID === theTrack.id;
         });
     } // getTrackByID()
 
@@ -226,22 +225,26 @@ jQuery(document).ready(function($) {
         //              the data-index simply has # in this list (not in original array)
 	function displayACollection()
 	{
-        $('#main-top-view').empty();
-        $('#tab-details').empty();
-        $('#track-table').empty();
+        var topView = $('#main-top-view');
+        var tabDetails = $('#tab-details');
+        var trackTable = $('#track-table');
+
+        topView.empty();
+        tabDetails.empty();
+        trackTable.empty();
 
         if (indexCollection >= 0) {
             var collEntry = getCollByTypeAndIndex(selCollType, indexCollection);
 
                 // Display colletion details in the top box
-            $('#main-top-view').append('<img class="album" src="'+collEntry.icon+'">');
-            $('#main-top-view').append('<p><b>'+collEntry.title+'</b></p>');
-            $('#main-top-view').append('<p>'+collEntry.abstract+'</p>');
+            topView.append('<img class="album" src="'+collEntry.icon+'">');
+            topView.append('<p><b>'+collEntry.title+'</b></p>');
+            topView.append('<p>'+collEntry.abstract+'</p>');
 
                 // Load collection details from file into #tab-details
             var xhr = new XMLHttpRequest();
             xhr.onload = function(e) {
-                $('#tab-details').append(xhr.responseText);
+                tabDetails.append(xhr.responseText);
             }
             xhr.open('GET', collEntry.details, true);
             xhr.send();
@@ -258,7 +261,7 @@ jQuery(document).ready(function($) {
                                 '"><input type="checkbox" name="'+theTrackID+'" '+checked+'><div class="track-title"><i class="fa fa-play-circle"></i> '+
                                 trackEntry.title+'</div><div class="track-time"> '+trackEntry.length+
                                 ' </div><div class="track-credits">'+trackEntry.abstract+'</div>';
-                $('#track-table').append(html);
+                trackTable.append(html);
             });
         }
 	} // displayACollection()
@@ -274,28 +277,30 @@ jQuery(document).ready(function($) {
         if (indexTrack >= 0) {
                 // Get the track info
             var trackID = $('.track-entry[data-index="'+indexTrack+'"]').data('id');
-            var theTrack = getTrackByID(trackID);
+            var trackEntry = getTrackByID(trackID);
 
                 // Can track be found?
-            if (theTrack) {
+            if (trackEntry) {
                     // Is there a transcript file?
-                if (theTrack.trans && theTrack.trans !== '') {
+                if (trackEntry.trans && trackEntry.trans !== '') {
+                    $('#track-transcript-title').text('Transcript for '+trackEntry.title);
                         // Load and parse transcript file
                     var xhr = new XMLHttpRequest();
                     xhr.onload = function(e) {
                         formatTranscript(xhr.responseText);
                     }
-                    xhr.open('GET', theTrack.trans, true);
+                    xhr.open('GET', trackEntry.trans, true);
                     xhr.send();
                 } else {
+                    $('#track-transcript-title').text('');
                     tcArray = [];
                 }
                     // Is there a SoundCloud file?
-                if (theTrack.url && theTrack.url !== '') {
+                if (trackEntry.url && trackEntry.url !== '') {
                     var footer = $('footer');
                     footer.empty();
                     footer.append('<iframe id="scWidget" class="player" width="100%" height="120" src="http://w.soundcloud.com/player/?url='+
-                                theTrack.url+'"></iframe>');
+                                trackEntry.url+'"></iframe>');
                     playWidget = SC.Widget(document.getElementById('scWidget'));
 
                     playWidget.bind(SC.Widget.Events.READY, function() {
@@ -332,6 +337,7 @@ jQuery(document).ready(function($) {
     {
         var userCollection = $('#pbs-user-collection');
         var trackEntry, html;
+
         userCollection.empty();
         _.each(userTracks, function(trackID, theIndex) {
             trackEntry = getTrackByID(trackID);
