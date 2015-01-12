@@ -3,6 +3,12 @@
  **/
 
 
+
+    /* For busy cursor */
+body.waiting * {
+    cursor: wait !important;
+}
+
   /* Normalize box sizes! See: http://css-tricks.com/international-box-sizing-awareness-day/
    */
 *, *:before, *:after {

@@ -33,8 +33,8 @@
         <div class="play-option" data-index="3" data-coll-type="essay"><i class="play-icon fa fa-newspaper-o"></i> Essays</div>
         <div class="play-option" data-index="4" data-coll-type="topic"><i class="play-icon fa fa-list"></i> Topics</div>
         <div class="play-option" data-index="5" data-coll-type="search"><i class="play-icon fa fa-search"></i> Search</div>
-        <div><input type="checkbox" name="search-title" value="search-title" checked="checked"/> Titles
-            <input type="checkbox" name="search-abstracts" value="search-abstracts" checked="checked"/> Abstracts
+        <div><input type="checkbox" name="search-titles" id="search-titles" checked="checked"/> Titles
+            <input type="checkbox" name="search-abstracts" id="search-abstracts" checked="checked"/> Abstracts
         </div>
         <input type="text" name="search-text" id="search-text" size="22" />
         <hr/>

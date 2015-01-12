@@ -255,8 +255,12 @@ jQuery(document).ready(function($) {
             _.each(trackList, function(theTrackID, trackIndex) {
                 trackEntry = getTrackByID(theTrackID);
                     // Check to see if this track is in user collection, and check if so
-                pos = _.sortedIndex(userTracks, theTrackID);
-                checked = userTracks[pos] === theTrackID ? 'checked' : '';
+                if (userTracks.length) {
+                    pos = _.sortedIndex(userTracks, theTrackID);
+                    checked = userTracks[pos] === theTrackID ? 'checked' : '';
+                } else {
+                    checked = '';
+                }
                 html = '<div class="track-entry" data-id="'+theTrackID+'" data-index="'+trackIndex+
                                 '"><input type="checkbox" name="'+theTrackID+'" '+checked+'><div class="track-title"><i class="fa fa-play-circle"></i> '+
                                 trackEntry.title+'</div><div class="track-time"> '+trackEntry.length+
@@ -357,7 +361,7 @@ jQuery(document).ready(function($) {
 			selIndex = parseInt(selIndex);
             var selCType = $(evt.target).data('coll-type');
             if (selCType === 'search') {
-                // TO DO: Search for $('#search-text').val()
+                doSearch();
 
             } else {
     			if (selIndex != indexCollType) {
@@ -435,8 +439,53 @@ jQuery(document).ready(function($) {
         // PURPOSE: Actually perform search functions and display resulting track names
     function doSearch()
     {
-            // TO DO: Unhighlight and clear collection selection
-            // TO DO: Search through list of tracks        
+        var searchTerm = $('#search-text').val();
+        var searchTitles = $('#search-titles:checked').val();
+        var searchAbstracts = $('#search-abstracts:checked').val();
+
+        if (!searchTitles && !searchAbstracts) {
+            return;
+        }
+            // Unhighlight and clear collection selection
+        $('.play-result').removeClass('selected');
+        $('#tab-details').empty();
+        $('#main-top-view').empty().append('Search results in tracks');
+        indexCollection=-1; selCollection = '';
+
+            // Clear out track listings and selection
+        var trackTable = $('#track-table');
+        trackTable.empty();
+        indexTrack=-1; selTrack = '';
+
+            // Create busy cursor during search
+        jQuery('body').addClass('waiting');
+            // Return control to browser briefly to ensure cursor updated
+        window.setTimeout(function() {
+                // case insensitive matching
+            var searchRE = new RegExp(searchTerm, 'i');
+            var pos, checked, html;
+
+                // Search through list of tracks
+            _.each(tracks, function(trackEntry, trackIndex) {
+                if ((searchTitles && trackEntry.title.match(searchRE)) ||
+                    (searchAbstracts && trackEntry.abstract.match(searchRE)))
+                {
+                        // check to see if track is in User Collection
+                    if (userTracks.length) {
+                        pos = _.sortedIndex(userTracks, trackEntry.id);
+                        checked = userTracks[pos] === trackEntry.id ? 'checked' : '';
+                    } else {
+                        checked = '';
+                    }
+                    html = '<div class="track-entry" data-id="'+trackEntry.id+'" data-index="'+trackIndex+
+                                    '"><input type="checkbox" name="'+trackEntry.id+'" '+checked+'><div class="track-title"><i class="fa fa-play-circle"></i> '+
+                                    trackEntry.title+'</div><div class="track-time"> '+trackEntry.length+
+                                    ' </div><div class="track-credits">'+trackEntry.abstract+'</div>';
+                    trackTable.append(html);
+                }
+            });
+            jQuery('body').removeClass('waiting');
+        }, 100);
     } // doSearch()
 
 
@@ -444,7 +493,11 @@ jQuery(document).ready(function($) {
         // NOTE:    Selection from Search button handled in bindSelectCollType
     function bindSearch()
     {
-        // TO DO
+        $('#search-text').on('keydown',function(e) {
+            if (e.keyCode === 13) {
+                doSearch();
+            }
+        });
     } // bindSearch()
 
 
