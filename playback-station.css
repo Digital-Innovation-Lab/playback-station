@@ -230,6 +230,10 @@ header {
 #pbs-user-collection .track-select-title {
 }
 
+#pbs-user-collection .track-select-title.playing {
+    color: red;
+}
+
     /* Specific screen/media optimizations =============
      */
 
@@ -402,6 +406,11 @@ nav hr {
 /* Track lists
  */
 
+ /* Play button for tracks: either in collection listing or user collection */
+i.fa-play-circle {
+    cursor: pointer;
+}
+
 #track-table {
     display: table;
     border-spacing: 8px 4px;
@@ -423,10 +432,6 @@ nav hr {
     display: table-cell;
     padding-left: 3px;
     padding-right: 3px;
-}
-
-#track-table .track-title .fa-play-circle {
-    cursor: pointer;
 }
 
 .track-year {

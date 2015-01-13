@@ -271,6 +271,58 @@ jQuery(document).ready(function($) {
 	} // displayACollection()
 
 
+        // PURPOSE: Create new transcription and SoundCloud player for track
+    function playATrack(trackEntry)
+    {
+            // Is there a transcript file?
+        if (trackEntry.trans && trackEntry.trans !== '') {
+            $('#track-transcript-title').text('Transcript for '+trackEntry.title);
+                // Load and parse transcript file
+            var xhr = new XMLHttpRequest();
+            xhr.onload = function(e) {
+                formatTranscript(xhr.responseText);
+            }
+            xhr.open('GET', trackEntry.trans, true);
+            xhr.send();
+        } else {
+            $('#track-transcript-title').text('');
+            tcArray = [];
+        }
+            // Is there a SoundCloud file?
+        if (trackEntry.url && trackEntry.url !== '') {
+            var footer = $('footer');
+            footer.empty();
+            footer.append('<iframe id="scWidget" class="player" width="100%" height="120" src="http://w.soundcloud.com/player/?url='+
+                        trackEntry.url+'"></iframe>');
+            playWidget = SC.Widget(document.getElementById('scWidget'));
+
+            playWidget.bind(SC.Widget.Events.READY, function() {
+                    // Select and highlight initial line of transcription
+                rowIndex = 0;
+                $('#transcr-table .transcr-timestamp[data-tcindex=0]').addClass('playing');
+
+                playWidget.play();
+                playWidget.bind(SC.Widget.Events.PLAY, function() {
+                    playingNow = true;
+                });
+                playWidget.bind(SC.Widget.Events.PAUSE, function() {
+                    playingNow = false;
+                });
+
+                playWidget.bind(SC.Widget.Events.PLAY_PROGRESS, function(params) {
+                    if (playingNow && tcArray.length > 0) {
+                        hightlightTranscriptLine(params.currentPosition);
+                    }
+                });
+
+                playWidget.bind(SC.Widget.Events.FINISH, function() {
+                    playingNow = false;
+                });
+            });
+        }
+    } // playATrack()
+
+
         // PURPOSE: Refresh track display given current track selection
         // NOTE:    indexTrack is the index on the current track list, not in the full tracks array
     function displayATrack()
@@ -285,52 +337,7 @@ jQuery(document).ready(function($) {
 
                 // Can track be found?
             if (trackEntry) {
-                    // Is there a transcript file?
-                if (trackEntry.trans && trackEntry.trans !== '') {
-                    $('#track-transcript-title').text('Transcript for '+trackEntry.title);
-                        // Load and parse transcript file
-                    var xhr = new XMLHttpRequest();
-                    xhr.onload = function(e) {
-                        formatTranscript(xhr.responseText);
-                    }
-                    xhr.open('GET', trackEntry.trans, true);
-                    xhr.send();
-                } else {
-                    $('#track-transcript-title').text('');
-                    tcArray = [];
-                }
-                    // Is there a SoundCloud file?
-                if (trackEntry.url && trackEntry.url !== '') {
-                    var footer = $('footer');
-                    footer.empty();
-                    footer.append('<iframe id="scWidget" class="player" width="100%" height="120" src="http://w.soundcloud.com/player/?url='+
-                                trackEntry.url+'"></iframe>');
-                    playWidget = SC.Widget(document.getElementById('scWidget'));
-
-                    playWidget.bind(SC.Widget.Events.READY, function() {
-                            // Select and highlight initial line of transcription
-                        rowIndex = 0;
-                        $('#transcr-table .transcr-timestamp[data-tcindex=0]').addClass('playing');
-
-                        playWidget.play();
-                        playWidget.bind(SC.Widget.Events.PLAY, function() {
-                            playingNow = true;
-                        });
-                        playWidget.bind(SC.Widget.Events.PAUSE, function() {
-                            playingNow = false;
-                        });
-
-                        playWidget.bind(SC.Widget.Events.PLAY_PROGRESS, function(params) {
-                            if (playingNow && tcArray.length > 0) {
-                                hightlightTranscriptLine(params.currentPosition);
-                            }
-                        });
-
-                        playWidget.bind(SC.Widget.Events.FINISH, function() {
-                            playingNow = false;
-                        });
-                    });
-                }
+                playATrack(trackEntry);
             }
         }
     } // displayATrack()
@@ -346,7 +353,7 @@ jQuery(document).ready(function($) {
         _.each(userTracks, function(trackID, theIndex) {
             trackEntry = getTrackByID(trackID);
             html = '<p class="user-track" data-id="'+trackID+'" data-index="'+theIndex+
-                '"><input class="user-track-select" type="checkbox" checked="checked"/> <span class="track-select-title">'+
+                '"><input class="user-track-select" type="checkbox" checked="checked"/> <i class="fa fa-play-circle"></i> <span class="track-select-title">'+
                 trackEntry.title+'</span></p>';
             userCollection.append(html);
         });
@@ -409,7 +416,7 @@ jQuery(document).ready(function($) {
 	} // bindSelectCollection()
 
 
-		// PURPOSE: Bind code that handles selecting a particular track
+		// PURPOSE: Bind code that handles selecting a particular track in collection frame
 	function bindSelectTrack()
 	{
 		$('#track-table').click(function(evt) {
@@ -421,8 +428,9 @@ jQuery(document).ready(function($) {
                     // Was the play button selected?
                 if ($(evt.target).hasClass('fa-play-circle')) {
                     if (selIndex != indexTrack) {
-                            // Update visuals
-                        $('.track-entry').removeClass('playing');
+                            // Deselect any previous track that was playing
+                        $('#track-table .track-entry').removeClass('playing');
+                        $('#pbs-user-collection .track-select-title').removeClass('playing');
                         // $('.track-entry[data-index="'+selIndex+'"]').removeClass('playing');
                         trackSel.addClass('playing');
                             // Set selection variables
@@ -484,6 +492,9 @@ jQuery(document).ready(function($) {
                     trackTable.append(html);
                 }
             });
+                // Reset all track selection data
+            selTrack=''; indexTrack=-1;
+
             jQuery('body').removeClass('waiting');
         }, 100);
     } // doSearch()
@@ -570,6 +581,29 @@ jQuery(document).ready(function($) {
                 localStorage[pbsStorageKey] = userTracks.join(',');
                     // Now, refresh display
                 displayUserCollection();
+            });
+                // Handle play button on User Collection track
+            $('#pbs-user-collection').click(function(evt) {
+                    // Was the play button selected?
+                if ($(evt.target).hasClass('fa-play-circle')) {
+                        // Get trackID
+                    var trackID = $(evt.target).parent().data('id');
+                    if (trackID) {
+                        var trackEntry = getTrackByID(trackID);
+
+                            // De-select any tracks from the collection list
+                        $('.track-entry').removeClass('playing');
+                        selTrack = ''; indexTrack=-1;
+
+                            // Add CSS style 'playing' to track currently playing
+                            // find next sibling DIV of class track-select-title, add playing
+                        $(evt.target).parent().find('.track-select-title').addClass('playing');
+
+                            // Empty out transcription table
+                        $('#transcr-table').empty();
+                        playATrack(trackEntry);
+                    }
+                }
             });
         }
     } // bindUserCollection()
