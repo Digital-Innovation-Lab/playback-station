@@ -51,7 +51,6 @@
         </div>
         <hr/>
         <p><b>User Collection</b></p>
-        <button id="update-user-collection" type="button">Update</button>
         <div id="pbs-user-container"><div id="pbs-user-collection">
         </div></div>
     </aside>

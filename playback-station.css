@@ -175,45 +175,10 @@ header {
 }
 
     /* Area for User Collection */
-.HolyGrail-activity button {
-   border-top: 1px solid #96d1f8;
-   background: #65a9d7;
-   background: -webkit-gradient(linear, left top, left bottom, from(#3e779d), to(#65a9d7));
-   background: -webkit-linear-gradient(top, #3e779d, #65a9d7);
-   background: -moz-linear-gradient(top, #3e779d, #65a9d7);
-   background: -ms-linear-gradient(top, #3e779d, #65a9d7);
-   background: -o-linear-gradient(top, #3e779d, #65a9d7);
-   padding: 5px 10px;
-   -webkit-border-radius: 8px;
-   -moz-border-radius: 8px;
-   border-radius: 8px;
-   -webkit-box-shadow: rgba(0,0,0,1) 0 1px 0;
-   -moz-box-shadow: rgba(0,0,0,1) 0 1px 0;
-   box-shadow: rgba(0,0,0,1) 0 1px 0;
-   text-shadow: rgba(0,0,0,.4) 0 1px 0;
-   color: white;
-   font-size: 12px;
-   text-decoration: none;
-   vertical-align: middle;
-
-   margin-left: 4px;
-}
-
-.HolyGrail-activity button:hover {
-   border-top-color: #28597a;
-   background: #28597a;
-   color: #ccc;
-}
-
-.HolyGrail-activity button:active {
-   border-top-color: #1b435e;
-   background: #1b435e;
-}
-
     /* Bottom part of right sidebar */
 #pbs-user-container {
     margin-top: 4px;
-    height: 322px;
+    height: 350px;
     overflow-y: auto;
 }
 
@@ -232,6 +197,14 @@ header {
 
 #pbs-user-collection .track-select-title.playing {
     color: red;
+}
+
+i.fa-plus:hover {
+    cursor: pointer;
+}
+
+i.fa-trash:hover {
+    cursor: pointer;
 }
 
     /* Specific screen/media optimizations =============
@@ -355,6 +328,7 @@ nav hr {
 
 .play-result {
     cursor: pointer;
+    margin-bottom: 4px;
 }
 
 .play-result:hover {
@@ -496,56 +470,5 @@ i.fa-play-circle {
     display: table-cell;
     padding-left: 3px;
     padding-right: 3px;
-}
-
-/* Footer Playback controls ========================
- */
-
-.play-slider {
-    margin-left: 15px;
-    margin-right: 15px;
-    margin-top: 4px;
-    width: 200px;
-
-    height: 8px;
-    background: url('lib/images/slider-bg.png');
-
-    background-color: #8e8d8d;
-
-    border-width: 1px;
-    border-style: solid;
-    border-color: #333 #333 #777 #333;
-    border-radius: 20px;
-
-/*    box-shadow: inset 0 1px 5px 0px rgba(0, 0, 0, .5),
-                 0 1px 0 0px rgba(250, 250, 250, .5);
- */
-}
-
-footer .ui-slider-handle {
-    width: 24px;
-    height: 24px;
-    cursor: pointer;
-
-    font-weight: bold;
-    color: #1C94C4;
-    outline: none;
-    margin-top: -2px;
-    margin-left:-12px;
-    z-index: 2;
-    background: url('lib/images/handle.png') no-repeat 50% 50%;
-
-    position: absolute;
-    top: -7px;
-}
-
-footer .ui-widget-header {
-    background: url('lib/images/fill.png') no-repeat left;
-    height:8px;
-/*
-    left:1px;
-    top:1px;
-    position:absolute;
-*/
 }
 

@@ -17,7 +17,7 @@
 //				pbs-icon/icon:		url to icon to display for collection
 //				pbs-type/type:		'year', 'station', 'person', 'essay', or 'topic'
 //				details:			url to text file to display for details
-//				tracks:				cs list of track IDs
+//				tracks:				comma-separated list of track IDs
 
 class Playback_Station {
 	protected $loader;
@@ -84,7 +84,7 @@ class Playback_Station {
 				$track_id = get_the_ID();
 
 					// Get the custom field values
-				$track["id"] = get_post_meta($track_id, "pbs-id", true);
+				$track["id"] = trim(get_post_meta($track_id, "pbs-id", true));
 				$track["title"] = get_post_meta($track_id, "pbs-title", true);
 				$track["abstract"] = get_the_content();
 				$track["url"] = get_post_meta($track_id, "pbs-url", true);

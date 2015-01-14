@@ -242,30 +242,36 @@ jQuery(document).ready(function($) {
             topView.append('<p>'+collEntry.abstract+'</p>');
 
                 // Load collection details from file into #tab-details
-            var xhr = new XMLHttpRequest();
-            xhr.onload = function(e) {
-                tabDetails.append(xhr.responseText);
+            if (collEntry.details && collEntry.details !== '') {
+                var xhr = new XMLHttpRequest();
+                xhr.onload = function(e) {
+                    tabDetails.append(xhr.responseText);
+                }
+                xhr.open('GET', collEntry.details, true);
+                xhr.send();
             }
-            xhr.open('GET', collEntry.details, true);
-            xhr.send();
 
                 // Display collection's list of tracks (in Tracks tab)
             var trackEntry, pos, html, checked;
             var trackList = collEntry.tracks.split(',');
             _.each(trackList, function(theTrackID, trackIndex) {
                 trackEntry = getTrackByID(theTrackID);
-                    // Check to see if this track is in user collection, and check if so
-                if (userTracks.length) {
-                    pos = _.sortedIndex(userTracks, theTrackID);
-                    checked = userTracks[pos] === theTrackID ? 'checked' : '';
+                if (trackEntry) {
+                        // Check to see if this track is in user collection, and check if so
+                    if (userTracks.length) {
+                        pos = _.sortedIndex(userTracks, theTrackID);
+                        checked = userTracks[pos] === theTrackID ? 'fa-check-square-o' : 'fa-plus';
+                    } else {
+                        checked = 'fa-plus';
+                    }
+                    html = '<div class="track-entry" data-id="'+theTrackID+'" data-index="'+trackIndex+
+                                    '"><div class="track-title"><i class="fa '+checked+'"></i> <i class="fa fa-play-circle"></i> '+
+                                    trackEntry.title+'</div><div class="track-time"> '+trackEntry.length+
+                                    ' </div><div class="track-credits">'+trackEntry.abstract+'</div>';
+                    trackTable.append(html);
                 } else {
-                    checked = '';
+                    console.log("Bad Collection track name: "+theTrackID);
                 }
-                html = '<div class="track-entry" data-id="'+theTrackID+'" data-index="'+trackIndex+
-                                '"><input type="checkbox" name="'+theTrackID+'" '+checked+'><div class="track-title"><i class="fa fa-play-circle"></i> '+
-                                trackEntry.title+'</div><div class="track-time"> '+trackEntry.length+
-                                ' </div><div class="track-credits">'+trackEntry.abstract+'</div>';
-                trackTable.append(html);
             });
         }
 	} // displayACollection()
@@ -352,10 +358,14 @@ jQuery(document).ready(function($) {
         userCollection.empty();
         _.each(userTracks, function(trackID, theIndex) {
             trackEntry = getTrackByID(trackID);
-            html = '<p class="user-track" data-id="'+trackID+'" data-index="'+theIndex+
-                '"><input class="user-track-select" type="checkbox" checked="checked"/> <i class="fa fa-play-circle"></i> <span class="track-select-title">'+
-                trackEntry.title+'</span></p>';
-            userCollection.append(html);
+            if (trackEntry) {
+                html = '<p class="user-track" data-id="'+trackID+'" data-index="'+theIndex+
+                    '"><i class="fa fa-trash"></i> <i class="fa fa-play-circle"></i> <span class="track-select-title">'+
+                    trackEntry.title+'</span></p>';
+                userCollection.append(html);
+            } else {
+                console.log("Bad User Collection track name: "+trackID);
+            }
         });
     } // displayUserCollection()
 
@@ -420,13 +430,14 @@ jQuery(document).ready(function($) {
 	function bindSelectTrack()
 	{
 		$('#track-table').click(function(evt) {
-			var trackSel = $(evt.target).closest('.track-entry').first();
+            var target = $(evt.target);
+			var trackSel = target.closest('.track-entry').first();
 			if (trackSel) {
-				var selIndex = $(trackSel).data('index');
+				var selIndex = trackSel.data('index');
 				selIndex = parseInt(selIndex);
 
                     // Was the play button selected?
-                if ($(evt.target).hasClass('fa-play-circle')) {
+                if (target.hasClass('fa-play-circle')) {
                     if (selIndex != indexTrack) {
                             // Deselect any previous track that was playing
                         $('#track-table .track-entry').removeClass('playing');
@@ -435,9 +446,19 @@ jQuery(document).ready(function($) {
                         trackSel.addClass('playing');
                             // Set selection variables
                         indexTrack = selIndex;
-                        selTrack = $(trackSel).data('id');
+                        selTrack = trackSel.data('id');
                         displayATrack();
                     }
+                } else if (target.hasClass('fa-plus')) {
+                        // Change the + to checkbox!
+                    target.removeClass('fa-plus');
+                    target.addClass('fa-check-square-o');
+                        // Update user tracks array
+                    insertUserTrack(trackSel.data('id'));
+                        // Update local storage
+                    localStorage[pbsStorageKey] = userTracks.join(',');
+                        // Recompute HTML
+                    displayUserCollection();
                 }
 			}
 		});
@@ -481,12 +502,12 @@ jQuery(document).ready(function($) {
                         // check to see if track is in User Collection
                     if (userTracks.length) {
                         pos = _.sortedIndex(userTracks, trackEntry.id);
-                        checked = userTracks[pos] === trackEntry.id ? 'checked' : '';
+                        checked = userTracks[pos] === trackEntry.id ? 'fa-check-square-o' : 'fa-plus';
                     } else {
-                        checked = '';
+                        checked = 'fa-plus';
                     }
                     html = '<div class="track-entry" data-id="'+trackEntry.id+'" data-index="'+trackIndex+
-                                    '"><input type="checkbox" name="'+trackEntry.id+'" '+checked+'><div class="track-title"><i class="fa fa-play-circle"></i> '+
+                                    '"><div class="track-title"><i class="fa '+checked+'"></i> <i class="fa fa-play-circle"></i> '+
                                     trackEntry.title+'</div><div class="track-time"> '+trackEntry.length+
                                     ' </div><div class="track-credits">'+trackEntry.abstract+'</div>';
                     trackTable.append(html);
@@ -558,50 +579,48 @@ jQuery(document).ready(function($) {
             parseStoredTracks();
             displayUserCollection();
 
-                // Handle Update button: 
-                // Update userTracks and local storage based on current checkboxes
-            $('#update-user-collection').click(function(evt) {
-                userTracks = [];
-                var trackList, trackID;
-                    // Get list from the right sidebar and insert in order
-                trackList = $('#pbs-user-collection .user-track-select:checked');
-                _.each(trackList, function(trackSelect) {
-                    trackID = $(trackSelect).parent().data("id");
-                    insertUserTrack(trackID);
-                });
-
-                    // Get list from current collection track list and insert in order
-                trackList = $('#track-table .track-entry input:checked');
-                _.each(trackList, function(trackSelect) {
-                    trackID = $(trackSelect).parent().data("id");
-                    insertUserTrack(trackID);
-                });
-
-                    // Save results in browser's local storage
-                localStorage[pbsStorageKey] = userTracks.join(',');
-                    // Now, refresh display
-                displayUserCollection();
-            });
                 // Handle play button on User Collection track
             $('#pbs-user-collection').click(function(evt) {
                     // Was the play button selected?
-                if ($(evt.target).hasClass('fa-play-circle')) {
+                var target = $(evt.target);
+                if (target.hasClass('fa-play-circle')) {
                         // Get trackID
-                    var trackID = $(evt.target).parent().data('id');
+                    var trackID = target.parent().data('id');
                     if (trackID) {
                         var trackEntry = getTrackByID(trackID);
+                        if (trackEntry) {
+                                // De-select any tracks from the collection list
+                            $('.track-entry').removeClass('playing');
+                            selTrack = ''; indexTrack=-1;
 
-                            // De-select any tracks from the collection list
-                        $('.track-entry').removeClass('playing');
-                        selTrack = ''; indexTrack=-1;
+                                // Add CSS style 'playing' to track currently playing
+                                // find next sibling DIV of class track-select-title, add playing
+                            target.parent().find('.track-select-title').addClass('playing');
 
-                            // Add CSS style 'playing' to track currently playing
-                            // find next sibling DIV of class track-select-title, add playing
-                        $(evt.target).parent().find('.track-select-title').addClass('playing');
-
-                            // Empty out transcription table
-                        $('#transcr-table').empty();
-                        playATrack(trackEntry);
+                                // Empty out transcription table
+                            $('#transcr-table').empty();
+                            playATrack(trackEntry);
+                        }
+                    }
+                } else if (target.hasClass('fa-trash')) {
+                    var trackID = target.parent().data('id');
+                    if (trackID) {
+                        var trackEntry = getTrackByID(trackID);
+                        if (trackEntry) {
+                                // Remove in User Track array
+                            var pos = _.sortedIndex(userTracks, trackID);
+                            if (userTracks[pos] === trackID) {
+                                userTracks.splice(pos, 1);
+                            }
+                                // Update local storage
+                            localStorage[pbsStorageKey] = userTracks.join(',');
+                                // If the current collection listing contains this, we must change icon to +
+                            var collTrack = $('#track-table div.track-entry[data-id="'+trackID+'"] i.fa-check-square-o');
+                            collTrack.removeClass('fa-check-square-o');
+                            collTrack.addClass('fa-plus');
+                                // Update HTML to remove this from User Collection
+                            target.parent().remove();
+                        }
                     }
                 }
             });
