@@ -519,8 +519,6 @@ jQuery(document).ready(function($) {
                 if ((searchTitles && trackEntry.title.match(searchRE)) ||
                     (searchAbstracts && trackEntry.abstract.match(searchRE)))
                 {
-                    numTracks++;
-
                         // check to see if track is in User Collection
                     if (userTracks.length) {
                         pos = _.sortedIndex(userTracks, trackEntry.id);
@@ -528,7 +526,7 @@ jQuery(document).ready(function($) {
                     } else {
                         checked = 'fa-plus';
                     }
-                    html = '<div class="track-entry" data-id="'+trackEntry.id+'" data-index="'+trackIndex+
+                    html = '<div class="track-entry" data-id="'+trackEntry.id+'" data-index="'+ numTracks++ +
                                     '"><div class="track-title"><i class="fa '+checked+'"></i> <i class="fa fa-play-circle"></i> '+
                                     trackEntry.title+'</div><div class="track-time"> '+trackEntry.length+
                                     ' </div><div class="track-credits">'+trackEntry.abstract+'</div>';
