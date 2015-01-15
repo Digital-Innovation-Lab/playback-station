@@ -19,21 +19,24 @@ jQuery(document).ready(function($) {
 	var tracks = psData.tracks;
 	var collections = psData.collections;
 
-		// Current selection (indices and values); -1 = none for indices, '' = none for selections
+		// Current selection (indices and values); -1 = none
 	var indexCollType, selCollType;
-	var indexCollection=-1, selCollection='';
-	var indexTrack=-1, selTrack='';
+	var indexCollection=-1;
+	var indexTrack=-1;
+    // var selTrack='', selCollection='';
 
     	// For processing transcriptions
     var parseTimeCode 	= /(\d\d)\:(\d\d)\:(\d\d)\.(\d\d?)/;         // an exacting regular expression for parsing time
     var tcArray			= [];
 
-    	// For playback
-    var rowIndex 		= -1;
-    var playingNow 		= false;
-    var playWidget 		= null;
+    	// For playback of sound and transcription
+    var rowIndex 		= -1;          // row of tcArray currently playing
+    var playingNow 		= false;       // Audio currently playing
+    var playWidget 		= null;        // SoundCloud widget object
+    var playingCurated  = true;        // false if track in User Collection, true if in #track-table
+    var numTracks       = 0;           // number of tracks in #track-table list
 
-        // For user collections -- array of Track IDs, sorted in order
+        // For User Collections -- array of Track IDs, kept in sorted order
     var pbsStorageKey   = 'pbs-user-collection';
     var userTracks      = [];
 
@@ -166,7 +169,7 @@ jQuery(document).ready(function($) {
 				// Handle any dangling text
 			if (textBlock.length) {
 					// Append very large number to ensure can't go past last item! 9 hours * 60 minutes * 60 seconds * 1000 milliseconds
-				tcArray.push({ start: lastStamp, end: 32400000 });
+				tcArray.push({ start: lastCode, end: 32400000 });
 				$('#transcr-table').append('<div class="transcr-entry"><div class="transcr-timestamp" data-timecode="'+
 					lastCode+'" data-tcindex="'+tcIndex+'">'+lastStamp+'</div><div class="transcr-text">'+textBlock+'</div></div>');
 			}
@@ -273,7 +276,8 @@ jQuery(document).ready(function($) {
                     console.log("Bad Collection track name: "+theTrackID);
                 }
             });
-        }
+            numTracks = trackList.length;
+        } // if indexCollection
 	} // displayACollection()
 
 
@@ -294,6 +298,7 @@ jQuery(document).ready(function($) {
             $('#track-transcript-title').text('');
             tcArray = [];
         }
+
             // Is there a SoundCloud file?
         if (trackEntry.url && trackEntry.url !== '') {
             var footer = $('footer');
@@ -323,9 +328,20 @@ jQuery(document).ready(function($) {
 
                 playWidget.bind(SC.Widget.Events.FINISH, function() {
                     playingNow = false;
+
+                        // Only advance through list for curated collections
+                    if (playingCurated) {
+                            // Only if not last track
+                        if (indexTrack < (numTracks-1)) {
+                                // Clear playing track class
+                            $('#track-table .track-entry[data-index="'+indexTrack+'"]').removeClass('playing');
+                            indexTrack++;
+                            displayATrack();
+                        }
+                    }
                 });
             });
-        }
+        } // if trackEntry.url
     } // playATrack()
 
 
@@ -337,8 +353,11 @@ jQuery(document).ready(function($) {
         $('#transcr-table').empty();
 
         if (indexTrack >= 0) {
+            var trackSel = $('.track-entry[data-index="'+indexTrack+'"]')
+            trackSel.addClass('playing');
+
                 // Get the track info
-            var trackID = $('.track-entry[data-index="'+indexTrack+'"]').data('id');
+            var trackID = trackSel.data('id');
             var trackEntry = getTrackByID(trackID);
 
                 // Can track be found?
@@ -390,8 +409,8 @@ jQuery(document).ready(function($) {
                     selCollType = selCType;
 
                         // Reset collection and track selections
-                    indexCollection = -1; selCollection = '';
-                    indexTrack = -1; selTrack = '';
+                    indexCollection = -1;
+                    indexTrack = -1;
 
     					// Show relevant collections of this type
     				displayAllCollections();
@@ -415,7 +434,7 @@ jQuery(document).ready(function($) {
 					$('.play-result').removeClass('selected');
 					$(evt.target).addClass('selected');
 						// Set selection variables
-					selCollection = $(evt.target).text();
+					// selCollection = $(evt.target).text();
 					indexCollection = selIndex;
 
 						// Display all material about selected collection
@@ -442,11 +461,11 @@ jQuery(document).ready(function($) {
                             // Deselect any previous track that was playing
                         $('#track-table .track-entry').removeClass('playing');
                         $('#pbs-user-collection .track-select-title').removeClass('playing');
-                        // $('.track-entry[data-index="'+selIndex+'"]').removeClass('playing');
-                        trackSel.addClass('playing');
                             // Set selection variables
                         indexTrack = selIndex;
-                        selTrack = trackSel.data('id');
+                        // selTrack = trackSel.data('id');
+                        playingCurated = true;
+                        // trackSel.addClass('playing');
                         displayATrack();
                     }
                 } else if (target.hasClass('fa-plus')) {
@@ -479,12 +498,13 @@ jQuery(document).ready(function($) {
         $('.play-result').removeClass('selected');
         $('#tab-details').empty();
         $('#main-top-view').empty().append('Search results in tracks');
-        indexCollection=-1; selCollection = '';
+        indexCollection=-1; // selCollection = '';
 
             // Clear out track listings and selection
         var trackTable = $('#track-table');
         trackTable.empty();
-        indexTrack=-1; selTrack = '';
+        indexTrack=-1; // selTrack = '';
+        numTracks = 0;
 
             // Create busy cursor during search
         jQuery('body').addClass('waiting');
@@ -499,6 +519,8 @@ jQuery(document).ready(function($) {
                 if ((searchTitles && trackEntry.title.match(searchRE)) ||
                     (searchAbstracts && trackEntry.abstract.match(searchRE)))
                 {
+                    numTracks++;
+
                         // check to see if track is in User Collection
                     if (userTracks.length) {
                         pos = _.sortedIndex(userTracks, trackEntry.id);
@@ -513,8 +535,6 @@ jQuery(document).ready(function($) {
                     trackTable.append(html);
                 }
             });
-                // Reset all track selection data
-            selTrack=''; indexTrack=-1;
 
             jQuery('body').removeClass('waiting');
         }, 100);
@@ -591,7 +611,8 @@ jQuery(document).ready(function($) {
                         if (trackEntry) {
                                 // De-select any tracks from the collection list
                             $('.track-entry').removeClass('playing');
-                            selTrack = ''; indexTrack=-1;
+                            indexTrack=-1; // selTrack = '';
+                            playingCurated = false;
 
                                 // Add CSS style 'playing' to track currently playing
                                 // find next sibling DIV of class track-select-title, add playing
@@ -622,9 +643,9 @@ jQuery(document).ready(function($) {
                             target.parent().remove();
                         }
                     }
-                }
-            });
-        }
+                } // if trash
+            }); // click in user collection
+        } // if local storage
     } // bindUserCollection()
 
 
