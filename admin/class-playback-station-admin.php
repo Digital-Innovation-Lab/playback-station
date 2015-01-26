@@ -1,10 +1,12 @@
 <?php
 
-// PURPOSE: Code that handles admin Dashboard functionality
+// PURPOSE: Code that handles admin Dashboard functionality and Options page
 
 class Playback_Station_Admin {
 
 	private $version;
+
+	private $options;
 
 	public function __construct( $version )
 	{
@@ -150,7 +152,7 @@ class Playback_Station_Admin {
 		}
     } // save_post()
 
-	// PURPOSE: Ensure that txt and png files are able to be added to the Media Library
+		// PURPOSE: Ensure that txt and png files are able to be added to the Media Library
 	public function add_mime_types($mime_types)
 	{
 	    $mime_types['txt'] = 'text/plain';
@@ -158,4 +160,116 @@ class Playback_Station_Admin {
 
 	    return $mime_types;
 	} // add_mime_types()
+
+
+		// PURPOSE: Handle Options for Playback Station
+	public function admin_menu()
+    {
+        // This page will be under "Settings"
+        add_options_page(
+            'Playback Admin',
+            'Playback Settings',
+            'manage_options', 
+            'pbs-settings-admin',
+            array( $this, 'create_admin_page' )
+        );
+    } // admin_menu()
+
+
+		// PURPOSE: Options page callback
+    public function create_admin_page()
+    {
+        // Set class property
+        $this->options = get_option('pbs_base_options');
+        ?>
+        <div class="wrap">
+            <h2>Playback Station Settings</h2>
+            <form method="post" action="options.php">
+            <?php
+                // This prints out all hidden setting fields
+                settings_fields('pbs_option_group');
+                do_settings_sections('pbs-settings-admin');
+                submit_button();
+            ?>
+            </form>
+        </div>
+        <?php
+    } // create_admin_page()
+
+
+		// PURPOSE: Register and add settings
+    public function admin_init()
+    {
+        	// To save options in DB
+        register_setting(
+            'pbs_option_group', // Option group
+            'pbs_base_options', // Option name
+            array( $this, 'sanitize' ) // Sanitize
+        );
+
+    		// To show settings on Options page
+        add_settings_section(
+            'pbs_settings', // ID
+            'Playback Customization Settings', // Title
+            array( $this, 'print_section_info' ), // Callback
+            'pbs-settings-admin' // Page
+        );
+
+        add_settings_field(
+            'pbs_prefix', // ID
+            'Collection Prefix', // Title
+            array( $this, 'pbs_prefix_callback' ), // Callback
+            'pbs-settings-admin', // Page
+            'pbs_settings' // Section
+        );
+
+        add_settings_field(
+            'pbs_coll_types',
+            'Collection Types',
+            array( $this, 'pbs_coll_types_callback' ),
+            'pbs-settings-admin',
+            'pbs_settings'
+        );
+    } // admin_init()
+
+
+    	// PURPOSE: Sanitize each setting field as needed
+    	// INPUT:   $input = all settings fields as array keys
+    public function sanitize( $input )
+    {
+        $new_input = array();
+
+        if (isset($input['pbs_prefix']))
+            $new_input['pbs_prefix'] = sanitize_text_field($input['pbs_prefix']);
+        if (isset($input['pbs_coll_types']))
+            $new_input['pbs_coll_types'] = sanitize_text_field($input['pbs_coll_types']);
+
+        return $new_input;
+    } // sanitize()
+
+
+    	// PURPOSE: Print the Section text
+    public function print_section_info()
+    {
+        echo '<p>Customize Playback Station on this website with these settings</p>';
+    }
+
+		// PURPOSE: Get the settings option array and print one of its values
+    public function pbs_prefix_callback()
+    {
+        printf(
+            '<input type="text" id="pbs_prefix" name="pbs_base_options[pbs_prefix]" value="%s" />',
+            isset( $this->options['pbs_prefix'] ) ? esc_attr( $this->options['pbs_prefix']) : ''
+        );
+    } // pbs_prefix_callback()
+
+    	// PURPOSE: Get the settings option array and print one of its values
+    public function pbs_coll_types_callback()
+    {
+        printf(
+            '<input type="text" id="pbs_coll_types" name="pbs_base_options[pbs_coll_types]" value="%s" />',
+            isset( $this->options['pbs_coll_types'] ) ? esc_attr( $this->options['pbs_coll_types']) : ''
+        );
+    } // pbs_coll_types_callback()
+
 } // class Playback_Station_Admin

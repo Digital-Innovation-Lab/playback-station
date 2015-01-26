@@ -12,7 +12,8 @@
 //						items: 	Array of collections of this type sorted by title
 //          Local user storage: CSV list of unique Track IDs (in sorted order) using key "pbs-tracks"
 
-// TO DO:   Handle coming to end of track currently playing: automatically play next if from collection??
+// TO DO:   Use project prefix for User Collection storage
+//          Fetch collection types from options
 
 jQuery(document).ready(function($) {
 		// access data compiled by plugin's PHP code

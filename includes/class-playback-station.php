@@ -241,7 +241,7 @@ class Playback_Station {
 	} // load_dependencies()
 
 
-		// PURPOSE: Add hooks related to Dashboard
+		// PURPOSE: Add hooks related to Dashboard and Options page
 	private function define_admin_hooks()
 	{
 			// Add Dashboard hooks
@@ -250,6 +250,9 @@ class Playback_Station {
 		$this->loader->add_action('add_meta_boxes', $admin, 'add_meta_boxes');
 		$this->loader->add_action('save_post', $admin, 'save_post');
 		$this->loader->add_action('upload_mimes', $admin, 'add_mime_types');
+
+        $this->loader->add_action('admin_menu', $admin, 'admin_menu');
+        $this->loader->add_action('admin_init', $admin, 'admin_init');
 	} // define_admin_hooks()
 
 
