@@ -41,8 +41,8 @@ jQuery(document).ready(function($) {
 
         // For User Collections -- array of Track IDs, kept in sorted order
     var userTracks      = [];
-    var pbsStorageKey   = (psData.settings && psData.settings.pbs_prexix) ?
-                            'pbs-user-coll-'+psData.settings.pbs_prexix : 'pbs-user-coll';
+    var pbsStorageKey   = (psData.settings && psData.settings.pbs_prefix) ?
+                            'pbs-user-coll-'+psData.settings.pbs_prefix : 'pbs-user-coll';
 
 
         // PURPOSE: Given a millisecond reading, unhighlight any previous "playhead" and highlight new one

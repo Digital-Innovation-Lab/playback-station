@@ -70,11 +70,22 @@ class Playback_Station_Admin {
 <p>Title for Collection <input type="text" name="pbs-title" id="pbs-title" size="32" value="<?php echo $pbs_title; ?>"> </p>
 <p>URL to icon <input type="text" name="pbs-icon" id="pbs-icon" size="48" value="<?php echo $pbs_icon; ?>"> </p>
 <p>Collection type <select name="pbs-type" id="pbs-type">
-	<option value="year" <?php if (isset($pbs_type)) selected($pbs_type, 'year'); ?>>Year</option>
-	<option value="station" <?php if (isset($pbs_type)) selected($pbs_type, 'station'); ?>>Station</option>
-	<option value="person" <?php if (isset($pbs_type)) selected($pbs_type, 'person'); ?>>Person</option>
-	<option value="essay" <?php if (isset($pbs_type)) selected($pbs_type, 'essay'); ?>>Essay</option>
-	<option value="topic" <?php if (isset($pbs_type)) selected($pbs_type, 'topic'); ?>>Topic</option>
+<?php
+		// Get setting for collection type definitions
+	$coll_settings = get_option('pbs_base_options');
+	$coll_settings = $coll_settings['pbs_coll_types'];
+		// Seperate each definition and process elements
+	$coll_defs = explode (",", $coll_settings);
+	foreach ($coll_defs as $the_def) {
+		$def_elements = explode("|", $the_def);
+		$def_elements[0] = trim($def_elements[0]);
+		$def_elements[1] = trim($def_elements[1]);
+		printf('<option value="'.$def_elements[0].'"');
+		if (isset($pbs_type))
+			selected($pbs_type, $def_elements[0]);
+		printf('>'.$def_elements[1].'</option>');
+	}
+?>
 </select></p>
 <p>URL to "details" file <input type="text" name="pbs-details" id="pbs-details" size="48" value="<?php echo $details; ?>"> </p>
 <p>Track list (comma-separated list) <input type="text" name="pbs-tracks" id="pbs-tracks" size="56" value="<?php echo $tracks; ?>"> </p>
@@ -217,7 +228,7 @@ class Playback_Station_Admin {
 
         add_settings_field(
             'pbs_prefix', // ID
-            'Collection Prefix', // Title
+            'User Storage Key', // Title
             array( $this, 'pbs_prefix_callback' ), // Callback
             'pbs-settings-admin', // Page
             'pbs_settings' // Section
