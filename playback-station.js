@@ -12,19 +12,21 @@
 //						items: 	Array of collections of this type sorted by title
 //          Local user storage: CSV list of unique Track IDs (in sorted order) using key "pbs-tracks"
 
-// TO DO:   Use project prefix for User Collection storage
-//          Fetch collection types from options
+// TO DO:   If track and collection grow very large, will need to minimize initial AJAX data and
+//              fetch more on request
 
 jQuery(document).ready(function($) {
 		// access data compiled by plugin's PHP code
 	var tracks = psData.tracks;
 	var collections = psData.collections;
 
+        // Types of collections defined for this project
+    var collTypes       = [];
+
 		// Current selection (indices and values); -1 = none
 	var indexCollType, selCollType;
 	var indexCollection=-1;
 	var indexTrack=-1;
-    // var selTrack='', selCollection='';
 
     	// For processing transcriptions
     var parseTimeCode 	= /(\d\d)\:(\d\d)\:(\d\d)\.(\d\d?)/;         // an exacting regular expression for parsing time
@@ -38,8 +40,9 @@ jQuery(document).ready(function($) {
     var numTracks       = 0;           // number of tracks in #track-table list
 
         // For User Collections -- array of Track IDs, kept in sorted order
-    var pbsStorageKey   = 'pbs-user-collection';
     var userTracks      = [];
+    var pbsStorageKey   = (psData.settings && psData.settings.pbs_prexix) ?
+                            'pbs-user-coll-'+psData.settings.pbs_prexix : 'pbs-user-coll';
 
 
         // PURPOSE: Given a millisecond reading, unhighlight any previous "playhead" and highlight new one
@@ -153,7 +156,6 @@ jQuery(document).ready(function($) {
                     			tcArray.push({ start: lastCode, end: timeCode });
                     		}
 							$('#transcr-table').append('<div class="transcr-entry"><div class="transcr-timestamp" data-timecode="'+
-                        		// timecode+'" data-tcindex="'+ tcIndex++ +'">'++'</div><div class="transcr-text">'+textBlock+'</div></div>');
                                 lastCode+'" data-tcindex="'+tcIndex++ +'">'+lastStamp+'</div><div class="type-text">'+textBlock+'</div></div>')
 
 							textBlock = '';
@@ -499,12 +501,12 @@ jQuery(document).ready(function($) {
         $('.play-result').removeClass('selected');
         $('#tab-details').empty();
         $('#main-top-view').empty().append('Search results in tracks');
-        indexCollection=-1; // selCollection = '';
+        indexCollection=-1;
 
             // Clear out track listings and selection
         var trackTable = $('#track-table');
         trackTable.empty();
-        indexTrack=-1; // selTrack = '';
+        indexTrack=-1;
         numTracks = 0;
 
             // Create busy cursor during search
@@ -648,13 +650,48 @@ jQuery(document).ready(function($) {
     } // bindUserCollection()
 
 
+        // PURPOSE: Process Collection types defined for this collection
+    function processCollTypes()
+    {
+        if (!psData.settings || !psData.settings.pbs_coll_types) {
+            throw new Error("Playback Station cannot run because no collection types have been defined for this project.");
+        }
+
+        var collDefs = psData.settings.pbs_coll_types.split(",");
+        _.forEach(collDefs, function(theCollDef, defIndex) {
+            var collElements = theCollDef.split("|");
+                // Need all three elements for definition to work
+            if (!collElements[0] || !collElements[1] || !collElements[2]) {
+                throw new Error("Playback Station cannot run because collection definition is incorrect: "+theCollDef);
+                    // Store ID
+            }
+            collElements[0] = collElements[0].trim();
+            collElements[1] = collElements[1].trim();
+            collElements[2] = collElements[2].trim();
+            collTypes.push(collElements[0]);
+                // Create HTML element
+            var htmlEntry = '<div class="play-option';
+            if (defIndex == 0)
+                htmlEntry += ' selected';
+            htmlEntry += ' data-index="' + defIndex + '" data-coll-type="' + collElements[0] +'"><i class="play-icon fa '+
+                collElements[2]+'"></i> '+ collElements[1] +'</div>';
+            $(htmlEntry).insertBefore("#search-boxes");
+        });
+        $('<div class="play-option" data-index="'+collTypes.length+
+            '" data-coll-type="search"><i class="play-icon fa fa-search"></i> Search</div>').insertBefore("#search-boxes");
+    } // processCollTypes()
+
+
 		// Initialize jQueryUI components
 	$('#main-tabbed').tabs();
 	$('.play-slider').slider();
 
 
+        // Process Collection definition settings
+    processCollTypes();
+
     	// Select Stations collection type by default
-    indexCollType = 0; selCollType = 'station';
+    indexCollType = 0; selCollType = collTypes[0];
     displayAllCollections();
 
     	// Bind code to handle UI components

@@ -267,7 +267,7 @@ class Playback_Station_Admin {
     public function pbs_coll_types_callback()
     {
         printf(
-            '<input type="text" id="pbs_coll_types" name="pbs_base_options[pbs_coll_types]" value="%s" />',
+            '<input type="text" id="pbs_coll_types" name="pbs_base_options[pbs_coll_types]" value="%s" size="48" />',
             isset( $this->options['pbs_coll_types'] ) ? esc_attr( $this->options['pbs_coll_types']) : ''
         );
     } // pbs_coll_types_callback()

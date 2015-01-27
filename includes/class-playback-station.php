@@ -141,7 +141,8 @@ class Playback_Station {
 			wp_localize_script('pbs-script', 'psData', array(
 				'ajax_url'		=> $ajax_url,
 				'tracks'		=> $tracks,
-				'collections'	=> $collections
+				'collections'	=> $collections,
+				'settings'		=> get_option('pbs_base_options')
 			) );
 
 			$page_template = dirname(__FILE__).'/../single-pbs-collection.php';
