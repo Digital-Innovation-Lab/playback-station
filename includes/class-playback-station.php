@@ -146,7 +146,6 @@ class Playback_Station {
 			) );
 
 			$page_template = dirname(__FILE__).'/../single-pbs-collection.php';
-			// $page_template = plugins_url('single-pbs-collection.php', dirname(__FILE__));
 		}
 		return $page_template;
 	} // pbs_page_template()
